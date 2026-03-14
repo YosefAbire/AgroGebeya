@@ -34,7 +34,7 @@ export function MessageList({ token, selectedUserId, onSelectConversation }: Mes
     // Filter conversations based on search query
     if (searchQuery.trim()) {
       const filtered = conversations.filter((conv) =>
-        conv.user_name.toLowerCase().includes(searchQuery.toLowerCase())
+        (conv.full_name || conv.username).toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredConversations(filtered);
     } else {
@@ -110,7 +110,7 @@ export function MessageList({ token, selectedUserId, onSelectConversation }: Mes
             {filteredConversations.map((conversation) => (
               <button
                 key={conversation.user_id}
-                onClick={() => onSelectConversation(conversation.user_id, conversation.user_name)}
+                onClick={() => onSelectConversation(conversation.user_id, conversation.full_name || conversation.username)}
                 className={`w-full p-4 text-left hover:bg-muted/50 transition-colors ${
                   selectedUserId === conversation.user_id ? 'bg-muted' : ''
                 }`}
@@ -121,7 +121,7 @@ export function MessageList({ token, selectedUserId, onSelectConversation }: Mes
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="font-semibold truncate">{conversation.user_name}</p>
+                      <p className="font-semibold truncate">{conversation.full_name || conversation.username}</p>
                       {conversation.unread_count > 0 && (
                         <Badge variant="destructive" className="ml-2">
                           {conversation.unread_count}

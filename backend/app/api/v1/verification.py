@@ -34,7 +34,7 @@ async def submit_verification(
     if not validate_ethiopian_national_id(national_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid Ethiopian National ID format. Must be 9 digits."
+            detail="Invalid Ethiopian National ID format. Must be 12 digits (FIN) or 8 digits (SN)."
         )
     
     # Check if user already has a verification request

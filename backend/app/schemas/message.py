@@ -23,7 +23,8 @@ class MessageResponse(BaseModel):
 class ConversationResponse(BaseModel):
     """Schema for conversation response"""
     user_id: int
-    user_name: str
+    username: str
+    full_name: Optional[str] = None
     last_message: str
     last_message_at: datetime
     unread_count: int

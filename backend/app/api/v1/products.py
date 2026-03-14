@@ -17,6 +17,7 @@ async def get_products(
     limit: int = Query(100, ge=1, le=100),
     category: Optional[str] = None,
     search: Optional[str] = None,
+    location: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
 ):
     query = select(Product).options(selectinload(Product.images))
@@ -26,6 +27,9 @@ async def get_products(
     
     if search:
         query = query.where(Product.name.ilike(f"%{search}%"))
+    
+    if location:
+        query = query.where(Product.location.ilike(f"%{location}%"))
     
     query = query.offset(skip).limit(limit)
     result = await db.execute(query)

@@ -126,7 +126,7 @@ export default function MultipleImageUpload({
           // Handle different URL types
           let imageSrc = image.url
           if (!imageSrc.startsWith('data:') && !imageSrc.startsWith('http')) {
-            imageSrc = `http://localhost:8000${imageSrc}`
+            imageSrc = `http://127.0.0.1:8000${imageSrc}`
           }
           
           return (

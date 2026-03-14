@@ -26,7 +26,7 @@ class UploadService {
     formData.append('file', file)
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/uploads/products/${productId}/images?is_primary=${isPrimary}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/products/${productId}/images?is_primary=${isPrimary}`,
       {
         method: 'POST',
         headers: {
@@ -55,7 +55,7 @@ class UploadService {
    */
   async deleteProductImage(imageId: number, token: string): Promise<void> {
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/uploads/products/images/${imageId}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/products/images/${imageId}`,
       {
         method: 'DELETE',
         headers: {
@@ -73,7 +73,7 @@ class UploadService {
     formData.append('file', file)
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/uploads/profile/image`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/profile/image`,
       {
         method: 'POST',
         headers: {
@@ -95,7 +95,7 @@ class UploadService {
    */
   async deleteProfileImage(token: string): Promise<void> {
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/uploads/profile/image`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/profile/image`,
       {
         method: 'DELETE',
         headers: {
@@ -111,7 +111,7 @@ class UploadService {
   getImageUrl(path: string): string {
     if (!path) return ''
     if (path.startsWith('http')) return path
-    return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}${path}`
+    return `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}${path}`
   }
 }
 

@@ -23,6 +23,8 @@ class OrderResponse(BaseModel):
     total_price: float
     status: OrderStatus
     delivery_date: Optional[datetime] = None
+    payment_status: Optional[str] = None
+    paid_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
     

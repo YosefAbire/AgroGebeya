@@ -22,7 +22,7 @@ async def init_database():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
-    print("✓ Database tables created")
+    print("+ Database tables created")
     
     # Create session
     AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -65,7 +65,7 @@ async def init_database():
         session.add_all(users)
         await session.commit()
         
-        print("✓ Test users created")
+        print("+ Test users created")
         print("  - farmer_demo / demo123 (Farmer)")
         print("  - retailer_demo / demo123 (Retailer)")
         print("  - admin / admin123 (Admin)")
@@ -130,10 +130,10 @@ async def init_database():
         session.add_all(products)
         await session.commit()
         
-        print(f"✓ {len(products)} test products created")
+        print(f"+ {len(products)} test products created")
     
     await engine.dispose()
-    print("\n✓ Database initialization complete!")
+    print("\n+ Database initialization complete!")
     print("\nYou can now start the backend server:")
     print("  uvicorn app.main:app --reload")
 

@@ -19,7 +19,7 @@ from app.schemas.transaction import (
 )
 from app.api.v1.auth import get_current_user
 from app.services.chapa_service import chapa_service
-from app.services.notification_service import notify_payment_completed
+from app.services.notification_service import notify_payment_completed, notify_order_status_change
 from app.core.config import settings
 
 router = APIRouter()
@@ -178,13 +178,16 @@ async def payment_webhook(
             order.payment_status = "paid"
             order.paid_at = datetime.utcnow()
         
-        # Send notification
+        # Send notification to retailer
         await notify_payment_completed(
             db,
             transaction.user_id,
             transaction.order_id,
             float(transaction.amount)
         )
+        # Also notify farmer that payment was received
+        if order:
+            await notify_order_status_change(db, order.farmer_id, order.id, "paid")
         
     elif payment_status == "failed":
         transaction.status = "failed"
@@ -406,32 +409,4 @@ async def process_refund(
         )
 
 
-@router.get("/transactions", response_model=list[TransactionResponse])
-async def list_user_transactions(
-    skip: int = 0,
-    limit: int = 50,
-    status: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """List user's transactions with optional filtering"""
-
-    # Build query
-    query = select(Transaction).where(Transaction.user_id == current_user.id)
-
-    # Apply status filter if provided
-    if status:
-        query = query.where(Transaction.status == status)
-
-    # Order by most recent first
-    query = query.order_by(Transaction.created_at.desc())
-
-    # Apply pagination
-    query = query.offset(skip).limit(limit)
-
-    # Execute query
-    result = await db.execute(query)
-    transactions = result.scalars().all()
-
-    return transactions
 

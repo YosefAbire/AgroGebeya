@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPin, User, Truck, ShoppingCart, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { MapPin, User, Truck, ShoppingCart, ArrowLeft } from 'lucide-react'
 import { useState, use, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -29,7 +29,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
   const loadProduct = async () => {
     try {
-      const data = await productService.getProduct(Number(id), token)
+      const data = await productService.getProduct(Number(id), token ?? undefined)
       setProduct(data)
     } catch (error) {
       toast.error('Failed to load product')
@@ -48,6 +48,11 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
     if (user.role !== 'retailer') {
       toast.error('Only retailers can place orders')
+      return
+    }
+
+    if (product.available_quantity < quantity) {
+      toast.error('Requested quantity exceeds available stock')
       return
     }
 
@@ -133,7 +138,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                   <Image
                     src={(() => {
                       const primaryImage = product.images.find((img: any) => img.is_primary)?.image_url || product.images[0]?.image_url;
-                      return primaryImage?.startsWith('http') ? primaryImage : `http://localhost:8000${primaryImage}`;
+                      return primaryImage?.startsWith('http') ? primaryImage : `http://127.0.0.1:8000${primaryImage}`;
                     })()}
                     alt={product.name}
                     width={400}
@@ -151,7 +156,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                         className="relative aspect-square rounded-lg border border-border overflow-hidden cursor-pointer hover:border-primary transition-colors"
                       >
                         <Image
-                          src={img.image_url.startsWith('http') ? img.image_url : `http://localhost:8000${img.image_url}`}
+                          src={img.image_url.startsWith('http') ? img.image_url : `http://127.0.0.1:8000${img.image_url}`}
                           alt={`${product.name} ${idx + 1}`}
                           fill
                           className="object-cover"
@@ -165,7 +170,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             ) : product.image_url ? (
               <div className="rounded-lg border border-border bg-secondary h-96 overflow-hidden">
                 <Image
-                  src={product.image_url.startsWith('http') ? product.image_url : `http://localhost:8000${product.image_url}`}
+                  src={product.image_url.startsWith('http') ? product.image_url : `http://127.0.0.1:8000${product.image_url}`}
                   alt={product.name}
                   width={400}
                   height={400}
@@ -263,7 +268,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleContactFarmer}
                 className="mt-4 w-full rounded-lg border border-primary px-4 py-2 text-center font-medium text-primary hover:bg-primary/10 transition-colors"
               >
@@ -361,11 +366,13 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 {/* Order Button */}
                 <button
                   onClick={handlePlaceOrder}
-                  disabled={submitting || !deliveryDate}
+                  disabled={submitting || !deliveryDate || product.available_quantity === 0}
                   className="w-full rounded-lg bg-primary px-6 py-3 text-lg font-semibold text-primary-foreground hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>Processing...</>
+                  ) : product.available_quantity === 0 ? (
+                    <>Out of Stock</>
                   ) : (
                     <>
                       <ShoppingCart className="h-5 w-5" />

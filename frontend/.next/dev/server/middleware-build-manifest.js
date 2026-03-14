@@ -1,23 +1,48 @@
 globalThis.__BUILD_MANIFEST = {
   "pages": {
-    "/_app": []
+    "/_app": [
+      "static/chunks/03ebc_next_dist_compiled_3f0795ec._.js",
+      "static/chunks/03ebc_next_dist_shared_lib_c7a16fa7._.js",
+      "static/chunks/03ebc_next_dist_client_f3c924d8._.js",
+      "static/chunks/03ebc_next_dist_013a6fd9._.js",
+      "static/chunks/03ebc_next_app_12b79338.js",
+      "static/chunks/[next]_entry_page-loader_ts_d731efa1._.js",
+      "static/chunks/03ebc_react-dom_a25ae89e._.js",
+      "static/chunks/03ebc_c12e2755._.js",
+      "static/chunks/[root-of-the-server]__50999833._.js",
+      "static/chunks/agrogebeya_frontend_pages__app_2da965e7._.js",
+      "static/chunks/turbopack-agrogebeya_frontend_pages__app_8baed6da._.js"
+    ],
+    "/_error": [
+      "static/chunks/03ebc_next_dist_compiled_3f0795ec._.js",
+      "static/chunks/03ebc_next_dist_shared_lib_d8dc6891._.js",
+      "static/chunks/03ebc_next_dist_client_f3c924d8._.js",
+      "static/chunks/03ebc_next_dist_d61628bb._.js",
+      "static/chunks/03ebc_next_error_697dcb88.js",
+      "static/chunks/[next]_entry_page-loader_ts_297bd5e9._.js",
+      "static/chunks/03ebc_react-dom_a25ae89e._.js",
+      "static/chunks/03ebc_c12e2755._.js",
+      "static/chunks/[root-of-the-server]__bf60da7d._.js",
+      "static/chunks/agrogebeya_frontend_pages__error_2da965e7._.js",
+      "static/chunks/turbopack-agrogebeya_frontend_pages__error_da75bf69._.js"
+    ]
   },
   "devFiles": [],
   "polyfillFiles": [
-    "static/chunks/d3273_next_dist_build_polyfills_polyfill-nomodule.js"
+    "static/chunks/03ebc_next_dist_build_polyfills_polyfill-nomodule.js"
   ],
   "lowPriorityFiles": [],
   "rootMainFiles": [
-    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_1a35ba52._.js",
-    "static/chunks/d3273_next_dist_compiled_react-dom_a4a1fcf0._.js",
-    "static/chunks/d3273_next_dist_compiled_react-server-dom-turbopack_0204e04f._.js",
-    "static/chunks/d3273_next_dist_compiled_next-devtools_index_183acd23.js",
-    "static/chunks/d3273_next_dist_compiled_7a317df5._.js",
-    "static/chunks/d3273_next_dist_client_17681815._.js",
-    "static/chunks/d3273_next_dist_2b34a4b4._.js",
-    "static/chunks/ff52d_@swc_helpers_cjs_44e5b1e7._.js",
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_caa5588d._.js",
+    "static/chunks/03ebc_next_dist_compiled_react-dom_9691e639._.js",
+    "static/chunks/03ebc_next_dist_compiled_react-server-dom-turbopack_80becbf1._.js",
+    "static/chunks/03ebc_next_dist_compiled_next-devtools_index_6b92e614.js",
+    "static/chunks/03ebc_next_dist_compiled_42fe331b._.js",
+    "static/chunks/03ebc_next_dist_client_e0e3403c._.js",
+    "static/chunks/03ebc_next_dist_7a3b820f._.js",
+    "static/chunks/03ebc_@swc_helpers_cjs_a45a4e95._.js",
     "static/chunks/agrogebeya_frontend_a0ff3932._.js",
-    "static/chunks/turbopack-agrogebeya_frontend_68ade161._.js"
+    "static/chunks/turbopack-agrogebeya_frontend_4797836a._.js"
   ]
 };
 globalThis.__BUILD_MANIFEST.lowPriorityFiles = [

@@ -26,7 +26,7 @@ export function useWebSocket({
     if (!token || wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000';
       const ws = new WebSocket(`${wsUrl}/api/v1/ws/notifications?token=${token}`);
 
       ws.onopen = () => {

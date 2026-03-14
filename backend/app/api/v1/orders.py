@@ -8,6 +8,7 @@ from app.models.product import Product
 from app.models.user import User
 from app.schemas.order import OrderCreate, OrderUpdate, OrderResponse
 from app.api.v1.auth import get_current_user
+from app.services.notification_service import notify_order_status_change
 
 router = APIRouter()
 
@@ -107,8 +108,34 @@ async def create_order(
     db.add(new_order)
     await db.commit()
     await db.refresh(new_order)
-    
+
+    # Notify farmer about new order
+    await notify_order_status_change(db, product.farmer_id, new_order.id, "pending")
+
     return new_order
+
+@router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def cancel_order(
+    order_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(Order).where(Order.id == order_id))
+    order = result.scalar_one_or_none()
+
+    if not order:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+
+    if order.retailer_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to cancel this order")
+
+    if order.status != OrderStatus.PENDING:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only pending orders can be cancelled")
+
+    await db.delete(order)
+    await db.commit()
+    return None
+
 
 @router.put("/{order_id}/status", response_model=OrderResponse)
 async def update_order_status(
@@ -134,15 +161,28 @@ async def update_order_status(
         )
     
     order.status = order_update.status
-    
-    # Update product quantity if approved
+
+    # Inventory management based on status transition
     if order_update.status == OrderStatus.APPROVED:
         result = await db.execute(select(Product).where(Product.id == order.product_id))
         product = result.scalar_one_or_none()
         if product:
+            if product.available_quantity < order.quantity:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient stock to approve this order"
+                )
             product.available_quantity -= order.quantity
-    
+
+    elif order_update.status == OrderStatus.REJECTED:
+        # Restore inventory if it was previously decremented (re-approval scenario)
+        pass  # inventory was not decremented at creation, so nothing to restore
+
     await db.commit()
     await db.refresh(order)
-    
+
+    # Notify the other party about the status change
+    notify_user_id = order.retailer_id if order.farmer_id == current_user.id else order.farmer_id
+    await notify_order_status_change(db, notify_user_id, order.id, order_update.status.value)
+
     return order

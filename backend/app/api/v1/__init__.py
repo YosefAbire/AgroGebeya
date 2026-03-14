@@ -13,6 +13,7 @@ from app.api.v1 import (
     ws,
     uploads,
     dashboard,
+    locations,
 )
 from app.api.v1.admin import (
     audit,
@@ -28,6 +29,7 @@ api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 api_router.include_router(products.router, prefix="/products", tags=["products"])
 api_router.include_router(orders.router, prefix="/orders", tags=["orders"])
+api_router.include_router(locations.router, prefix="/locations", tags=["locations"])
 
 # User endpoints
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])

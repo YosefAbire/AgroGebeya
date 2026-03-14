@@ -9,7 +9,7 @@ export const authService = {
     formData.append('username', credentials.username);
     formData.append('password', credentials.password);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/auth/login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -28,12 +28,12 @@ export const authService = {
   },
 
   async register(data: RegisterData): Promise<User> {
-    const user = await api.post<User>('/api/auth/register', data);
+    const user = await api.post<User>('/api/v1/auth/register', data);
     return user;
   },
 
   async getCurrentUser(token: string): Promise<User> {
-    return api.get<User>('/api/auth/me', token);
+    return api.get<User>('/api/v1/auth/me', token);
   },
 
   setToken(token: string): void {

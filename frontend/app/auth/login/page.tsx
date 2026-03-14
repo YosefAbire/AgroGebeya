@@ -53,11 +53,17 @@ export default function LoginPage() {
       await login(formData.username, formData.password)
 
       setSuccess('Login successful! Redirecting...')
-      
-      // Brief delay to show success message
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      router.push('/dashboard')
+
+      // Read role directly from localStorage (set by login()) to avoid state race
+      const storedUser = localStorage.getItem('user')
+      const role = storedUser ? JSON.parse(storedUser).role : null
+
+      const destination =
+        role === 'admin' ? '/admin' :
+        role === 'retailer' ? '/dashboard/retailer' :
+        '/dashboard/farmer'
+
+      router.push(destination)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred. Please try again.'
       setError(errorMessage)
@@ -66,14 +72,24 @@ export default function LoginPage() {
     }
   }
 
-  const handleDemoLogin = async (username: string) => {
-    setFormData({
-      username: username,
-      password: 'password123',
-      rememberMe: false,
-    })
+  const handleDemoLogin = async (username: string, password = 'password123') => {
     setError('')
     setSuccess('')
+    setIsLoading(true)
+    try {
+      await login(username, password)
+      const storedUser = localStorage.getItem('user')
+      const role = storedUser ? JSON.parse(storedUser).role : null
+      const destination =
+        role === 'admin' ? '/admin' :
+        role === 'retailer' ? '/dashboard/retailer' :
+        '/dashboard/farmer'
+      router.push(destination)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -187,8 +203,8 @@ export default function LoginPage() {
 
             {/* Demo Accounts Info */}
             <div className="bg-secondary/50 rounded p-4 space-y-3">
-              <p className="text-xs font-medium text-foreground">Available Test Accounts:</p>
-              <div className="grid grid-cols-2 gap-2">
+              <p className="text-xs font-medium text-foreground">Quick Login (Demo Accounts):</p>
+              <div className="grid grid-cols-3 gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -197,24 +213,34 @@ export default function LoginPage() {
                   disabled={isLoading}
                   className="text-xs"
                 >
-                  Yosef (Farmer)
+                  Farmer
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDemoLogin('farmer1')}
+                  onClick={() => handleDemoLogin('retailer1')}
                   disabled={isLoading}
                   className="text-xs"
                 >
-                  Farmer1
+                  Retailer
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDemoLogin('admin', 'admin123')}
+                  disabled={isLoading}
+                  className="text-xs"
+                >
+                  Admin
                 </Button>
               </div>
               <div className="text-xs text-muted-foreground space-y-1 border-t border-border/30 pt-3">
-                <p className="font-medium text-foreground">Test Credentials:</p>
-                <p>Username: yosef | Password: password123</p>
-                <p>Username: farmer1 | Password: password123</p>
-                <p>Username: retailer1 | Password: password123</p>
+                <p className="font-medium text-foreground">Credentials:</p>
+                <p>Farmer: yosef / password123</p>
+                <p>Retailer: retailer1 / password123</p>
+                <p>Admin: admin / admin123</p>
               </div>
             </div>
           </form>

@@ -8,8 +8,8 @@ export const verificationService = {
   },
 
   // Get user's verification status
-  getStatus: async (token: string): Promise<VerificationRequest> => {
-    return api.get<VerificationRequest>('/api/v1/verification/status', token);
+  getStatus: async (token: string): Promise<{ status: string; submitted_at?: string; reviewed_at?: string; rejection_reason?: string }> => {
+    return api.get('/api/v1/verification/status', token);
   },
 
   // Admin: Get pending verifications
@@ -26,7 +26,7 @@ export const verificationService = {
   reject: async (id: number, reason: string, token: string): Promise<VerificationRequest> => {
     return api.post<VerificationRequest>(
       `/api/v1/verification/admin/${id}/reject`,
-      { reason },
+      { rejection_reason: reason },
       token
     );
   },

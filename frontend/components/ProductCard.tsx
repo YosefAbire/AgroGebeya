@@ -31,7 +31,7 @@ function getImageUrl(image: string | undefined): string | null {
   
   // If it's a relative path, prepend backend URL
   if (trimmed.startsWith('/')) {
-    return `http://localhost:8000${trimmed}`;
+    return `http://127.0.0.1:8000${trimmed}`;
   }
   
   // Invalid format

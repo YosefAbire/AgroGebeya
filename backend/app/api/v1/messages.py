@@ -146,7 +146,8 @@ async def get_conversations(
                 
                 conversations[partner_id] = ConversationResponse(
                     user_id=partner.id,
-                    user_name=partner.full_name or partner.username,
+                    username=partner.username,
+                    full_name=partner.full_name,
                     last_message=message.content[:100],  # Truncate for preview
                     last_message_at=message.created_at,
                     unread_count=unread_count

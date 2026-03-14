@@ -1,13 +1,13 @@
 __turbopack_load_page_chunks__("/_app", [
-  "static/chunks/d3273_next_dist_compiled_5a6e01c0._.js",
-  "static/chunks/d3273_next_dist_shared_lib_1d6a71ae._.js",
-  "static/chunks/d3273_next_dist_client_648f9ca9._.js",
-  "static/chunks/d3273_next_dist_658df4eb._.js",
-  "static/chunks/d3273_next_app_8b866b3a.js",
-  "static/chunks/[next]_entry_page-loader_ts_c83ab87a._.js",
-  "static/chunks/74a23_react-dom_a05697fc._.js",
-  "static/chunks/03ebc__pnpm_48c740a3._.js",
+  "static/chunks/03ebc_next_dist_compiled_3f0795ec._.js",
+  "static/chunks/03ebc_next_dist_shared_lib_c7a16fa7._.js",
+  "static/chunks/03ebc_next_dist_client_f3c924d8._.js",
+  "static/chunks/03ebc_next_dist_013a6fd9._.js",
+  "static/chunks/03ebc_next_app_12b79338.js",
+  "static/chunks/[next]_entry_page-loader_ts_d731efa1._.js",
+  "static/chunks/03ebc_react-dom_a25ae89e._.js",
+  "static/chunks/03ebc_c12e2755._.js",
   "static/chunks/[root-of-the-server]__50999833._.js",
   "static/chunks/agrogebeya_frontend_pages__app_2da965e7._.js",
-  "static/chunks/turbopack-agrogebeya_frontend_pages__app_8001ddea._.js"
+  "static/chunks/turbopack-agrogebeya_frontend_pages__app_8baed6da._.js"
 ])

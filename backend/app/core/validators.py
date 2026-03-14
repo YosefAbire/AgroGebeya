@@ -3,7 +3,10 @@ from typing import Optional
 
 def validate_ethiopian_national_id(national_id: str) -> bool:
     """
-    Validate Ethiopian National ID format (9 digits)
+    Validate Ethiopian National ID format.
+    Accepts:
+      - FIN (Fayda ID Number): exactly 12 digits
+      - SN  (Serial Number):   exactly 8 digits
     
     Args:
         national_id: National ID string to validate
@@ -17,8 +20,8 @@ def validate_ethiopian_national_id(national_id: str) -> bool:
     # Remove any whitespace
     national_id = national_id.strip()
     
-    # Check if it's exactly 9 digits
-    pattern = r'^\d{9}$'
+    # Accept 8-digit SN or 12-digit FIN
+    pattern = r'^(\d{8}|\d{12})$'
     return bool(re.match(pattern, national_id))
 
 

@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { productService } from '@/lib/product-service'
 import { Product } from '@/lib/types'
 import { useAuthContext } from '@/components/AuthProvider'
+import { locationService } from '@/lib/services/location-service'
 
 export default function ProductsPage() {
   const { token } = useAuthContext()
@@ -15,12 +16,15 @@ export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedLocation, setSelectedLocation] = useState('')
   const [sortBy, setSortBy] = useState('newest')
+  const [cities, setCities] = useState<string[]>([])
 
   const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy', 'Spices', 'Beverages']
 
   useEffect(() => {
     loadProducts()
+    locationService.getCities().then(setCities).catch(() => {})
   }, [])
 
   const loadProducts = async () => {
@@ -41,6 +45,12 @@ export default function ProductsPage() {
   if (selectedCategory !== 'all') {
     filteredProducts = filteredProducts.filter((p) =>
       p.category.toLowerCase() === selectedCategory.toLowerCase()
+    )
+  }
+
+  if (selectedLocation) {
+    filteredProducts = filteredProducts.filter((p) =>
+      p.location?.toLowerCase().includes(selectedLocation.toLowerCase())
     )
   }
 
@@ -116,6 +126,16 @@ export default function ProductsPage() {
 
             <div className="flex items-center gap-2">
               <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="">All Locations</option>
+                {cities.map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}

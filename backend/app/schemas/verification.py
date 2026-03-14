@@ -3,8 +3,18 @@ from typing import Optional
 from datetime import datetime
 
 class VerificationRequestCreate(BaseModel):
-    """Schema for submitting National ID for verification"""
-    national_id: str = Field(..., min_length=9, max_length=9, description="Ethiopian National ID (9 digits)")
+    """Schema for submitting National ID for verification.
+    
+    Accepts:
+      - FIN (Fayda ID Number): 12 digits
+      - SN  (Serial Number):   8 digits
+    """
+    national_id: str = Field(
+        ...,
+        min_length=8,
+        max_length=12,
+        description="Ethiopian National ID — FIN (12 digits) or SN (8 digits)",
+    )
 
 class VerificationRequestResponse(BaseModel):
     """Schema for verification request response"""

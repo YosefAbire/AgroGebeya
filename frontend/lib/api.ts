@@ -1,23 +1,56 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 interface RequestOptions extends RequestInit {
   token?: string;
 }
 
+// --- Utility: check if token expired ---
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return Date.now() >= payload.exp * 1000;
+  } catch {
+    return true; // treat invalid tokens as expired
+  }
+}
+
+// --- Utility: refresh token ---
+async function refreshToken(): Promise<string | null> {
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) return null;
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  });
+
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  localStorage.setItem('authToken', data.access_token);
+  return data.access_token;
+}
+
+// --- Core request wrapper ---
 async function apiRequest<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { token, ...fetchOptions } = options;
+  let token = options.token || localStorage.getItem('authToken');
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...fetchOptions.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  // Refresh if expired
+  if (token && isTokenExpired(token)) {
+    token = await refreshToken();
+    if (!token) throw new Error('Session expired. Please log in again.');
   }
+
+  const { ...fetchOptions } = options;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(fetchOptions.headers as Record<string, string> || {}),
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...fetchOptions,
@@ -25,13 +58,20 @@ async function apiRequest<T>(
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
-    throw new Error(error.detail || `HTTP error! status: ${response.status}`);
+    let errorDetail;
+    try {
+      const errorData = await response.json();
+      errorDetail = errorData.detail || errorData.message || JSON.stringify(errorData);
+    } catch {
+      errorDetail = await response.text().catch(() => 'An error occurred');
+    }
+    throw new Error(`HTTP ${response.status}: ${errorDetail}`);
   }
 
   return response.json();
 }
 
+// --- Exported API methods ---
 export const api = {
   get: <T>(endpoint: string, token?: string) =>
     apiRequest<T>(endpoint, { method: 'GET', token }),

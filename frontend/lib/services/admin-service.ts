@@ -180,7 +180,7 @@ export const reportsService = {
   // Export data
   exportData: async (type: string, token: string, format: string = 'csv'): Promise<Blob> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/admin/export/${type}?format=${format}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/admin/export/${type}?format=${format}`,
       {
         method: 'POST',
         headers: {
@@ -213,7 +213,7 @@ export const configService = {
   // Export config
   exportConfig: async (token: string): Promise<Blob> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/admin/config/export`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/admin/config/export`,
       {
         method: 'POST',
         headers: {
@@ -230,7 +230,7 @@ export const configService = {
     const formData = new FormData();
     formData.append('file', file);
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/admin/config/import`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/admin/config/import`,
       {
         method: 'POST',
         headers: {
@@ -270,7 +270,7 @@ export const backupService = {
   // Download backup
   download: async (backupId: number, token: string): Promise<Blob> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/admin/backups/${backupId}/download`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/admin/backups/${backupId}/download`,
       {
         method: 'GET',
         headers: {

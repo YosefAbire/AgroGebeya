@@ -1,264 +1,171 @@
 'use client'
 
-import React from "react"
-
-import { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import Header from '@/components/Header'
-import { CreditCard, DollarSign, CheckCircle2, Clock, X } from 'lucide-react'
+import { CreditCard, DollarSign, CheckCircle2, Clock, ExternalLink } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { orderService } from '@/lib/order-service'
+import { api } from '@/lib/api'
+import { Order } from '@/lib/types'
+import { LoadingSkeleton } from '@/components/common/LoadingSkeleton'
+import { EmptyState } from '@/components/common/EmptyState'
+import { PaymentInitializeResponse } from '@/lib/types-extended'
 
-type PaymentMethod = 'card' | 'bank' | 'mobile' | 'cash'
+const PAYMENT_METHODS = [
+  { id: 'chapa', name: 'Chapa Payment', icon: CreditCard, description: 'Pay via Telebirr, bank, or card through Chapa' },
+  { id: 'cash', name: 'Cash on Delivery', icon: DollarSign, description: 'Pay upon delivery' },
+]
 
 export default function PaymentPage() {
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('card')
-  const [amount, setAmount] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [orderNumber, setOrderNumber] = useState('')
+  const { token } = useAuth()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+  const [selectedMethod, setSelectedMethod] = useState('chapa')
+  const [processing, setProcessing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const paymentMethods = [
-    {
-      id: 'card',
-      name: 'Credit/Debit Card',
-      icon: CreditCard,
-      description: 'Visa, Mastercard, or local cards',
-    },
-    {
-      id: 'bank',
-      name: 'Bank Transfer',
-      icon: DollarSign,
-      description: 'Direct bank account transfer',
-    },
-    {
-      id: 'mobile',
-      name: 'Mobile Money',
-      icon: CreditCard,
-      description: 'Telebirr, M-Birr, or other services',
-    },
-    {
-      id: 'cash',
-      name: 'Cash on Delivery',
-      icon: DollarSign,
-      description: 'Pay upon delivery',
-    },
-  ]
+  const loadOrders = useCallback(async () => {
+    if (!token) return
+    try {
+      setLoading(true)
+      const data = await orderService.getOrders(token)
+      setOrders(data.filter(o => o.status === 'approved' || o.status === 'pending'))
+    } catch {
+      setError('Failed to load orders.')
+    } finally {
+      setLoading(false)
+    }
+  }, [token])
 
-  const mockOrders = [
-    { number: 'ORD-2024-001847', amount: 45250, date: 'Jan 15, 2024', status: 'pending' },
-    { number: 'ORD-2024-001846', amount: 32500, date: 'Jan 10, 2024', status: 'paid' },
-  ]
+  useEffect(() => { loadOrders() }, [loadOrders])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const selectedOrder = orders.find(o => o.id === selectedOrderId)
+
+  const handlePay = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!amount || !orderNumber) return
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 3000)
+    if (!token || !selectedOrderId) return
+    setProcessing(true)
+    setError(null)
+    try {
+      if (selectedMethod === 'chapa') {
+        const result = await api.post<PaymentInitializeResponse>(
+          '/api/v1/payments/initialize',
+          { order_id: selectedOrderId, return_url: `${window.location.origin}/payment/success` },
+          token
+        )
+        window.location.href = result.checkout_url
+      } else {
+        // Cash on delivery — confirm selection, farmer will mark as delivered on receipt
+        alert(`Cash on delivery confirmed for Order #${selectedOrderId}. The farmer will mark it delivered upon receipt.`)
+        await loadOrders()
+        setSelectedOrderId(null)
+      }
+    } catch (err: any) {
+      setError(err.message || 'Payment failed.')
+    } finally {
+      setProcessing(false)
+    }
   }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Payment Management</h1>
         <p className="text-muted-foreground mb-8">Manage payments for your orders</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Payment Form */}
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle>Make Payment</CardTitle>
-                <CardDescription>Select a payment method and process your payment</CardDescription>
-              </CardHeader>
+              <CardHeader><CardTitle>Make Payment</CardTitle><CardDescription>Select an order and payment method</CardDescription></CardHeader>
               <CardContent>
-                {submitted && (
-                  <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg flex gap-3 mb-6">
-                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                {loading ? <LoadingSkeleton type="form" count={3} /> : (
+                  <form onSubmit={handlePay} className="space-y-6">
                     <div>
-                      <p className="font-medium text-green-900 dark:text-green-100">Payment processed successfully!</p>
-                      <p className="text-sm text-green-800 dark:text-green-200">Your payment has been recorded.</p>
+                      <Label htmlFor="order">Select Order</Label>
+                      {orders.length === 0 ? (
+                        <p className="text-sm text-muted-foreground mt-2">No pending orders to pay for.</p>
+                      ) : (
+                        <select
+                          id="order"
+                          value={selectedOrderId ?? ''}
+                          onChange={(e) => setSelectedOrderId(Number(e.target.value) || null)}
+                          className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground mt-2"
+                          required
+                        >
+                          <option value="">Choose an order...</option>
+                          {orders.map(o => (
+                            <option key={o.id} value={o.id}>
+                              Order #{o.id} — ETB {o.total_price.toLocaleString()}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </div>
-                  </div>
-                )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Order Selection */}
-                  <div>
-                    <Label htmlFor="order">Select Order</Label>
-                    <select
-                      id="order"
-                      value={orderNumber}
-                      onChange={(e) => {
-                        setOrderNumber(e.target.value)
-                        const order = mockOrders.find(o => o.number === e.target.value)
-                        if (order) setAmount(order.amount.toString())
-                      }}
-                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground mt-2"
-                      required
-                    >
-                      <option value="">Choose an order...</option>
-                      {mockOrders.filter(o => o.status === 'pending').map(order => (
-                        <option key={order.number} value={order.number}>
-                          {order.number} - ৳{order.amount.toLocaleString()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    {selectedOrder && (
+                      <div className="p-4 bg-secondary/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Amount Due</p>
+                        <p className="text-2xl font-bold text-primary">ETB {selectedOrder.total_price.toLocaleString()}</p>
+                      </div>
+                    )}
 
-                  {/* Amount */}
-                  <div>
-                    <Label htmlFor="amount">Amount (৳)</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      placeholder="0"
-                      disabled
-                      className="mt-2"
-                    />
-                  </div>
-
-                  {/* Payment Method Selection */}
-                  <div>
-                    <Label>Payment Method</Label>
-                    <div className="grid grid-cols-2 gap-3 mt-3">
-                      {paymentMethods.map(method => {
-                        const IconComponent = method.icon
-                        return (
-                          <button
-                            key={method.id}
-                            type="button"
-                            onClick={() => setSelectedMethod(method.id as PaymentMethod)}
-                            className={`p-3 border rounded-lg text-left transition-all ${
-                              selectedMethod === method.id
-                                ? 'border-primary bg-primary/10'
-                                : 'border-border hover:border-primary'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 mb-2">
-                              <IconComponent className="h-4 w-4" />
-                              <p className="font-medium text-sm text-foreground">{method.name}</p>
+                    <div>
+                      <Label>Payment Method</Label>
+                      <div className="grid grid-cols-2 gap-3 mt-3">
+                        {PAYMENT_METHODS.map(m => (
+                          <button key={m.id} type="button" onClick={() => setSelectedMethod(m.id)}
+                            className={`p-3 border rounded-lg text-left transition-all ${selectedMethod === m.id ? 'border-primary bg-primary/10' : 'border-border hover:border-primary'}`}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <m.icon className="h-4 w-4" />
+                              <p className="font-medium text-sm">{m.name}</p>
                             </div>
-                            <p className="text-xs text-muted-foreground">{method.description}</p>
+                            <p className="text-xs text-muted-foreground">{m.description}</p>
                           </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Method-specific Fields */}
-                  {selectedMethod === 'card' && (
-                    <div className="space-y-4 p-4 bg-muted rounded-lg border border-border">
-                      <div>
-                        <Label htmlFor="cardName">Card Holder Name</Label>
-                        <Input id="cardName" placeholder="John Doe" className="mt-2" />
-                      </div>
-                      <div>
-                        <Label htmlFor="cardNumber">Card Number</Label>
-                        <Input id="cardNumber" placeholder="4532 1488 0343 6467" className="mt-2" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="expiry">Expiry Date</Label>
-                          <Input id="expiry" placeholder="MM/YY" className="mt-2" />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input id="cvv" placeholder="123" type="password" className="mt-2" />
-                        </div>
+                        ))}
                       </div>
                     </div>
-                  )}
 
-                  {selectedMethod === 'bank' && (
-                    <div className="space-y-4 p-4 bg-muted rounded-lg border border-border">
-                      <div>
-                        <Label htmlFor="accountName">Account Holder Name</Label>
-                        <Input id="accountName" placeholder="Your Name" className="mt-2" />
-                      </div>
-                      <div>
-                        <Label htmlFor="accountNumber">Account Number</Label>
-                        <Input id="accountNumber" placeholder="1234567890" className="mt-2" />
-                      </div>
-                      <div>
-                        <Label htmlFor="bank">Bank Name</Label>
-                        <select className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground mt-2">
-                          <option>Commercial Bank of Ethiopia</option>
-                          <option>Awash Bank</option>
-                          <option>Dashen Bank</option>
-                          <option>United Bank</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
+                    {error && <p className="text-sm text-destructive">{error}</p>}
 
-                  {selectedMethod === 'mobile' && (
-                    <div className="space-y-4 p-4 bg-muted rounded-lg border border-border">
-                      <div>
-                        <Label htmlFor="mobileNumber">Phone Number</Label>
-                        <Input id="mobileNumber" placeholder="+251911234567" className="mt-2" />
-                      </div>
-                      <div>
-                        <Label htmlFor="provider">Mobile Money Provider</Label>
-                        <select className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground mt-2">
-                          <option>Telebirr</option>
-                          <option>M-Birr</option>
-                          <option>Ebirr</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedMethod === 'cash' && (
-                    <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <p className="text-sm text-blue-900 dark:text-blue-100">
-                        You will pay ৳{amount || '0'} in cash when the order is delivered.
-                      </p>
-                    </div>
-                  )}
-
-                  <Button type="submit" disabled={!amount || !orderNumber} className="w-full h-11">
-                    Process Payment
-                  </Button>
-                </form>
+                    <Button type="submit" disabled={!selectedOrderId || processing} className="w-full h-11">
+                      {processing ? 'Processing...' : selectedMethod === 'chapa' ? (
+                        <span className="flex items-center gap-2">Pay via Chapa <ExternalLink className="h-4 w-4" /></span>
+                      ) : 'Confirm Cash on Delivery'}
+                    </Button>
+                  </form>
+                )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Payment History */}
           <div>
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Recent Orders</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle className="text-lg">Recent Orders</CardTitle></CardHeader>
               <CardContent className="space-y-3">
-                {mockOrders.map(order => (
-                  <div key={order.number} className="p-3 border border-border rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
-                      <p className="font-medium text-foreground text-sm">{order.number}</p>
-                      <div
-                        className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${
-                          order.status === 'paid'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {order.status === 'paid' ? (
-                          <CheckCircle2 className="h-3 w-3" />
-                        ) : (
-                          <Clock className="h-3 w-3" />
-                        )}
-                        {order.status === 'paid' ? 'Paid' : 'Pending'}
+                {loading ? <LoadingSkeleton type="list" count={2} /> :
+                  orders.length === 0 ? (
+                    <EmptyState icon={CreditCard} title="No orders" description="No pending orders." />
+                  ) : (
+                    orders.slice(0, 5).map(o => (
+                      <div key={o.id} className="p-3 border border-border rounded-lg">
+                        <div className="flex items-start justify-between mb-1">
+                          <p className="font-medium text-sm">Order #{o.id}</p>
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1 ${o.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {o.status === 'delivered' ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                            {o.status}
+                          </span>
+                        </div>
+                        <p className="text-sm font-bold">ETB {o.total_price.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{new Date(o.created_at).toLocaleDateString()}</p>
                       </div>
-                    </div>
-                    <p className="text-sm text-foreground font-bold">৳{order.amount.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{order.date}</p>
-                  </div>
-                ))}
+                    ))
+                  )
+                }
               </CardContent>
             </Card>
           </div>

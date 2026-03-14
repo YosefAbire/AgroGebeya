@@ -1,8 +1,8 @@
 (globalThis.TURBOPACK_CHUNK_LISTS || (globalThis.TURBOPACK_CHUNK_LISTS = [])).push({
     script: typeof document === "object" ? document.currentScript : undefined,
     chunks: [
-  "static/chunks/agrogebeya_frontend_796abf12._.js",
-  "static/chunks/03ebc__pnpm_bf9a99ae._.js"
+  "static/chunks/agrogebeya_frontend_22939651._.js",
+  "static/chunks/03ebc__pnpm_aab36325._.js"
 ],
     source: "dynamic"
 });
