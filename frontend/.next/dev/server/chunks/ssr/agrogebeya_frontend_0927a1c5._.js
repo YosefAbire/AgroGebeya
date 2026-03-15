@@ -1284,7 +1284,7 @@ async function refreshToken() {
     });
     if (!response.ok) return null;
     const data = await response.json();
-    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('authToken', data.access_token);
     return data.access_token;
 }
 function useAuth() {
@@ -1296,7 +1296,7 @@ function useAuth() {
         const initializeAuth = async ()=>{
             try {
                 const storedUser = localStorage.getItem('user');
-                let storedToken = localStorage.getItem('token');
+                let storedToken = localStorage.getItem('authToken');
                 if (storedToken && isTokenExpired(storedToken)) {
                     storedToken = await refreshToken();
                 }
@@ -1344,7 +1344,7 @@ function useAuth() {
             }
             const userData = await userResponse.json();
             localStorage.setItem('user', JSON.stringify(userData));
-            localStorage.setItem('token', accessToken);
+            localStorage.setItem('authToken', accessToken);
             if (refreshTokenValue) {
                 localStorage.setItem('refreshToken', refreshTokenValue);
             }
@@ -1359,7 +1359,7 @@ function useAuth() {
         try {
             await new Promise((resolve)=>setTimeout(resolve, 500));
             localStorage.removeItem('user');
-            localStorage.removeItem('token');
+            localStorage.removeItem('authToken');
             localStorage.removeItem('refreshToken');
             setUser(null);
             setToken(null);

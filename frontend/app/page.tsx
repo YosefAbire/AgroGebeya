@@ -231,18 +231,18 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-foreground">Company</h4>
               <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
+                <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+                <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
+                <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-semibold text-foreground">Legal</h4>
               <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Cookies</a></li>
+                <li><Link href="/legal/privacy" className="hover:text-primary transition-colors">Privacy</Link></li>
+                <li><Link href="/legal/terms" className="hover:text-primary transition-colors">Terms</Link></li>
+                <li><Link href="/legal/cookies" className="hover:text-primary transition-colors">Cookies</Link></li>
               </ul>
             </div>
           </div>

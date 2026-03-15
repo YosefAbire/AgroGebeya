@@ -100,7 +100,7 @@ function LogoutPage() {
             localStorage.removeItem('user');
             localStorage.removeItem('authToken');
             localStorage.removeItem('rememberMe');
-            router.push('/auth/login');
+            router.push('/');
         }, 2000);
         return ()=>clearTimeout(timer);
     }, [
@@ -144,7 +144,7 @@ function LogoutPage() {
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                         className: "text-muted-foreground mb-8",
-                        children: "You have been logged out. Redirecting to login page..."
+                        children: "You have been logged out. Redirecting to home page..."
                     }, void 0, false, {
                         fileName: "[project]/agrogebeya/frontend/app/auth/logout/page.tsx",
                         lineNumber: 34,
@@ -201,8 +201,8 @@ function LogoutPage() {
                                 asChild: true,
                                 className: "w-full",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/auth/login",
-                                    children: "Back to Login"
+                                    href: "/",
+                                    children: "Back to Home"
                                 }, void 0, false, {
                                     fileName: "[project]/agrogebeya/frontend/app/auth/logout/page.tsx",
                                     lineNumber: 50,

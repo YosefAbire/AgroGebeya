@@ -14,7 +14,7 @@ export default function LogoutPage() {
       localStorage.removeItem('user')
       localStorage.removeItem('authToken')
       localStorage.removeItem('rememberMe')
-      router.push('/auth/login')
+      router.push('/')
     }, 2000)
 
     return () => clearTimeout(timer)
@@ -32,7 +32,7 @@ export default function LogoutPage() {
 
           <h1 className="text-2xl font-bold text-foreground mb-2">Logged Out Successfully</h1>
           <p className="text-muted-foreground mb-8">
-            You have been logged out. Redirecting to login page...
+            You have been logged out. Redirecting to home page...
           </p>
 
           <div className="flex items-center justify-center gap-2 mb-8">
@@ -47,8 +47,8 @@ export default function LogoutPage() {
               asChild
               className="w-full"
             >
-              <Link href="/auth/login">
-                Back to Login
+              <Link href="/">
+                Back to Home
               </Link>
             </Button>
           </div>
