@@ -449,13 +449,15 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
     const wsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const reconnectTimeoutRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(undefined);
     const pingIntervalRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(undefined);
+    const reconnectAttemptsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(0);
+    const MAX_RECONNECT_ATTEMPTS = 5;
     const connect = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(()=>{
         if (!token || wsRef.current?.readyState === WebSocket.OPEN) return;
         try {
             const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000';
             const ws = new WebSocket(`${wsUrl}/api/v1/ws/notifications?token=${token}`);
             ws.onopen = ()=>{
-                console.log('WebSocket connected');
+                reconnectAttemptsRef.current = 0;
                 setIsConnected(true);
                 onConnect?.();
                 // Start ping interval to keep connection alive
@@ -463,7 +465,7 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                     if (ws.readyState === WebSocket.OPEN) {
                         ws.send('ping');
                     }
-                }, 25000); // Ping every 25 seconds
+                }, 25000);
             };
             ws.onmessage = (event)=>{
                 try {
@@ -498,25 +500,20 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                     console.error('Error parsing WebSocket message:', error);
                 }
             };
-            ws.onerror = (error)=>{
-                // Silently handle WebSocket errors - they're expected when backend is not running
-                console.log('WebSocket connection unavailable');
+            ws.onerror = ()=>{
+            // Silently handle - expected when backend is unavailable
             };
-            ws.onclose = ()=>{
-                console.log('WebSocket disconnected');
+            ws.onclose = (event)=>{
                 setIsConnected(false);
                 onDisconnect?.();
-                // Clear ping interval
-                if (pingIntervalRef.current) {
-                    clearInterval(pingIntervalRef.current);
-                }
-                // Attempt to reconnect only if explicitly enabled
-                if (autoReconnect) {
-                    reconnectTimeoutRef.current = setTimeout(()=>{
-                        console.log('Attempting to reconnect...');
-                        connect();
-                    }, 5000); // Reconnect after 5 seconds
-                }
+                if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+                // Don't reconnect on auth failure (4001) or if disabled
+                if (!autoReconnect || event.code === 4001) return;
+                reconnectAttemptsRef.current += 1;
+                if (reconnectAttemptsRef.current > MAX_RECONNECT_ATTEMPTS) return;
+                // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+                const delay = Math.min(5000 * Math.pow(2, reconnectAttemptsRef.current - 1), 60000);
+                reconnectTimeoutRef.current = setTimeout(connect, delay);
             };
             wsRef.current = ws;
         } catch (error) {

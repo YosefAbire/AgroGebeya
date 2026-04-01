@@ -7,6 +7,7 @@ import Header from '@/components/Header'
 import MultipleImageUpload from '@/components/MultipleImageUpload'
 import { uploadService } from '@/lib/services/upload-service'
 import { useAuth } from '@/hooks/use-auth'
+import { toast } from 'sonner'
 
 interface ImageItem {
   id?: number
@@ -132,6 +133,7 @@ export default function NewProductPage() {
       }
 
       // Redirect to product page or products list
+      toast.success('Product created successfully!')
       router.push('/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create product')
@@ -152,7 +154,7 @@ export default function NewProductPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} noValidate className="space-y-6">
           {/* Product Images */}
           <div className="rounded-lg border border-border bg-card p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Product Images</h2>

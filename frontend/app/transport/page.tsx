@@ -56,6 +56,8 @@ export default function TransportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
+    if (!form.pickup_location.trim()) { setError('Pickup location is required'); return }
+    if (!form.delivery_location.trim()) { setError('Delivery location is required'); return }
     setSubmitting(true)
     try {
       await transportService.createRequest({
@@ -156,7 +158,7 @@ export default function TransportPage() {
                   <div><p className="font-medium text-green-900">Request submitted!</p><p className="text-sm text-green-800">We will contact you within 24 hours.</p></div>
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
+              <form onSubmit={handleSubmit} noValidate className="space-y-4 max-w-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div><Label htmlFor="pickup_location">Pickup Location</Label><Input id="pickup_location" name="pickup_location" value={form.pickup_location} onChange={handleChange} required className="mt-2" /></div>
                   <div><Label htmlFor="delivery_location">Delivery Location</Label><Input id="delivery_location" name="delivery_location" value={form.delivery_location} onChange={handleChange} required className="mt-2" /></div>

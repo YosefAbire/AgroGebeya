@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
@@ -17,6 +17,7 @@ from app.api.v1.auth import get_current_user
 from app.core.encryption import encryption_service
 from app.core.validators import validate_ethiopian_national_id, sanitize_national_id
 from app.services.notification_service import notify_verification_status
+from app.core.file_storage import save_id_image, delete_file
 
 router = APIRouter()
 
@@ -242,6 +243,51 @@ async def reject_verification(
         reject_data.rejection_reason
     )
     
+    return verification_request
+
+
+@router.post("/upload-id-images", response_model=VerificationRequestResponse)
+async def upload_id_images(
+    front_image: UploadFile = File(..., description="Front side of the National ID"),
+    back_image: UploadFile = File(..., description="Back side of the National ID"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Upload front and back photos of the National ID for an existing verification request"""
+
+    result = await db.execute(
+        select(VerificationRequest).where(VerificationRequest.user_id == current_user.id)
+    )
+    verification_request = result.scalar_one_or_none()
+
+    if not verification_request:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No verification request found. Submit your National ID first."
+        )
+
+    if verification_request.status == "verified":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User is already verified"
+        )
+
+    # Delete old images if they exist
+    if verification_request.id_front_image_url:
+        delete_file(verification_request.id_front_image_url)
+    if verification_request.id_back_image_url:
+        delete_file(verification_request.id_back_image_url)
+
+    # Save new images
+    front_url = await save_id_image(front_image)
+    back_url = await save_id_image(back_image)
+
+    verification_request.id_front_image_url = front_url
+    verification_request.id_back_image_url = back_url
+
+    await db.commit()
+    await db.refresh(verification_request)
+
     return verification_request
 
 

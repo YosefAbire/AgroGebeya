@@ -18,6 +18,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const [quantity, setQuantity] = useState(1)
   const [deliveryDate, setDeliveryDate] = useState('')
   const [product, setProduct] = useState<any>(null)
+  const [activeImage, setActiveImage] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [showContactForm, setShowContactForm] = useState(false)
@@ -31,6 +32,14 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     try {
       const data = await productService.getProduct(Number(id), token ?? undefined)
       setProduct(data)
+      // Set initial active image to primary or first
+      if (data.images?.length) {
+        const primary = data.images.find((img: any) => img.is_primary) || data.images[0]
+        const url = primary.image_url.startsWith('http') ? primary.image_url : `http://127.0.0.1:8000${primary.image_url}`
+        setActiveImage(url)
+      } else if (data.image_url) {
+        setActiveImage(data.image_url.startsWith('http') ? data.image_url : `http://127.0.0.1:8000${data.image_url}`)
+      }
     } catch (error) {
       toast.error('Failed to load product')
       console.error(error)
@@ -131,55 +140,30 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Product Image */}
           <div className="lg:col-span-1">
-            {product.images && product.images.length > 0 ? (
-              <div className="space-y-4">
-                {/* Main Image */}
+            {activeImage ? (
+              <div className="space-y-3">
+                {/* Main image */}
                 <div className="rounded-lg border border-border bg-secondary h-96 overflow-hidden">
-                  <Image
-                    src={(() => {
-                      const primaryImage = product.images.find((img: any) => img.is_primary)?.image_url || product.images[0]?.image_url;
-                      return primaryImage?.startsWith('http') ? primaryImage : `http://127.0.0.1:8000${primaryImage}`;
-                    })()}
-                    alt={product.name}
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
+                  <Image src={activeImage} alt={product.name} width={400} height={400}
+                    className="w-full h-full object-cover transition-opacity duration-200" unoptimized />
                 </div>
-                {/* Thumbnail Gallery */}
-                {product.images.length > 1 && (
+                {/* Thumbnails */}
+                {product.images?.length > 1 && (
                   <div className="grid grid-cols-4 gap-2">
-                    {product.images.map((img: any, idx: number) => (
-                      <div
-                        key={img.id || idx}
-                        className="relative aspect-square rounded-lg border border-border overflow-hidden cursor-pointer hover:border-primary transition-colors"
-                      >
-                        <Image
-                          src={img.image_url.startsWith('http') ? img.image_url : `http://127.0.0.1:8000${img.image_url}`}
-                          alt={`${product.name} ${idx + 1}`}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                    ))}
+                    {product.images.map((img: any, idx: number) => {
+                      const url = img.image_url.startsWith('http') ? img.image_url : `http://127.0.0.1:8000${img.image_url}`
+                      return (
+                        <button key={img.id || idx} type="button" onClick={() => setActiveImage(url)}
+                          className={`relative aspect-square rounded-lg border-2 overflow-hidden transition-colors ${activeImage === url ? 'border-primary' : 'border-border hover:border-primary/50'}`}>
+                          <Image src={url} alt={`${product.name} ${idx + 1}`} fill className="object-cover" unoptimized />
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>
-            ) : product.image_url ? (
-              <div className="rounded-lg border border-border bg-secondary h-96 overflow-hidden">
-                <Image
-                  src={product.image_url.startsWith('http') ? product.image_url : `http://127.0.0.1:8000${product.image_url}`}
-                  alt={product.name}
-                  width={400}
-                  height={400}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              </div>
             ) : (
-              <div className="rounded-lg border border-border bg-secondary h-96 flex items-center justify-center overflow-hidden">
+              <div className="rounded-lg border border-border bg-secondary h-96 flex items-center justify-center">
                 <div className="text-center text-muted-foreground">
                   <p className="text-6xl">📦</p>
                   <p className="mt-4 text-sm">{product.category}</p>

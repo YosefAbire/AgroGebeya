@@ -2,7 +2,7 @@
     script: typeof document === "object" ? document.currentScript : undefined,
     chunks: [
   "static/chunks/agrogebeya_frontend_86be186e._.js",
-  "static/chunks/03ebc_ac3ded37._.js"
+  "static/chunks/03ebc_776c626a._.js"
 ],
     source: "dynamic"
 });

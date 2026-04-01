@@ -504,6 +504,8 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
     const wsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const reconnectTimeoutRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(undefined);
     const pingIntervalRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(undefined);
+    const reconnectAttemptsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(0);
+    const MAX_RECONNECT_ATTEMPTS = 5;
     const connect = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "useWebSocket.useCallback[connect]": ()=>{
             if (!token || wsRef.current?.readyState === WebSocket.OPEN) return;
@@ -512,7 +514,7 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                 const ws = new WebSocket(`${wsUrl}/api/v1/ws/notifications?token=${token}`);
                 ws.onopen = ({
                     "useWebSocket.useCallback[connect]": ()=>{
-                        console.log('WebSocket connected');
+                        reconnectAttemptsRef.current = 0;
                         setIsConnected(true);
                         onConnect?.();
                         // Start ping interval to keep connection alive
@@ -522,7 +524,7 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                                     ws.send('ping');
                                 }
                             }
-                        }["useWebSocket.useCallback[connect]"], 25000); // Ping every 25 seconds
+                        }["useWebSocket.useCallback[connect]"], 25000);
                     }
                 })["useWebSocket.useCallback[connect]"];
                 ws.onmessage = ({
@@ -567,29 +569,22 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                     }
                 })["useWebSocket.useCallback[connect]"];
                 ws.onerror = ({
-                    "useWebSocket.useCallback[connect]": (error)=>{
-                        // Silently handle WebSocket errors - they're expected when backend is not running
-                        console.log('WebSocket connection unavailable');
+                    "useWebSocket.useCallback[connect]": ()=>{
+                    // Silently handle - expected when backend is unavailable
                     }
                 })["useWebSocket.useCallback[connect]"];
                 ws.onclose = ({
-                    "useWebSocket.useCallback[connect]": ()=>{
-                        console.log('WebSocket disconnected');
+                    "useWebSocket.useCallback[connect]": (event)=>{
                         setIsConnected(false);
                         onDisconnect?.();
-                        // Clear ping interval
-                        if (pingIntervalRef.current) {
-                            clearInterval(pingIntervalRef.current);
-                        }
-                        // Attempt to reconnect only if explicitly enabled
-                        if (autoReconnect) {
-                            reconnectTimeoutRef.current = setTimeout({
-                                "useWebSocket.useCallback[connect]": ()=>{
-                                    console.log('Attempting to reconnect...');
-                                    connect();
-                                }
-                            }["useWebSocket.useCallback[connect]"], 5000); // Reconnect after 5 seconds
-                        }
+                        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+                        // Don't reconnect on auth failure (4001) or if disabled
+                        if (!autoReconnect || event.code === 4001) return;
+                        reconnectAttemptsRef.current += 1;
+                        if (reconnectAttemptsRef.current > MAX_RECONNECT_ATTEMPTS) return;
+                        // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+                        const delay = Math.min(5000 * Math.pow(2, reconnectAttemptsRef.current - 1), 60000);
+                        reconnectTimeoutRef.current = setTimeout(connect, delay);
                     }
                 })["useWebSocket.useCallback[connect]"];
                 wsRef.current = ws;
@@ -649,7 +644,7 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
         disconnect
     };
 }
-_s(useWebSocket, "zrmLpIJlfmBcuCyG0ZBmjdJcRrk=");
+_s(useWebSocket, "oTo1FMvovmsMMr7pRtH0RR5YHW0=");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -1818,12 +1813,32 @@ __turbopack_context__.s([
     "verificationService",
     ()=>verificationService
 ]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/agrogebeya/frontend/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/agrogebeya/frontend/lib/api.ts [app-client] (ecmascript)");
 ;
+const API_BASE_URL = ("TURBOPACK compile-time value", "http://127.0.0.1:8000") || 'http://127.0.0.1:8000';
 const verificationService = {
     // Submit National ID for verification
     submit: async (data, token)=>{
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].post('/api/v1/verification/submit', data, token);
+    },
+    // Upload front and back ID photos
+    uploadIdImages: async (frontImage, backImage, token)=>{
+        const formData = new FormData();
+        formData.append('front_image', frontImage);
+        formData.append('back_image', backImage);
+        const response = await fetch(`${API_BASE_URL}/api/v1/verification/upload-id-images`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: formData
+        });
+        if (!response.ok) {
+            const err = await response.json().catch(()=>({}));
+            throw new Error(err.detail || 'Failed to upload ID images');
+        }
+        return response.json();
     },
     // Get user's verification status
     getStatus: async (token)=>{
@@ -2278,6 +2293,23 @@ function useAuth() {
     }["useAuth.useCallback[register]"], [
         login
     ]);
+    const refreshUser = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "useAuth.useCallback[refreshUser]": async ()=>{
+            const storedToken = localStorage.getItem('authToken');
+            if (!storedToken) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+                    headers: {
+                        Authorization: `Bearer ${storedToken}`
+                    }
+                });
+                if (!res.ok) return;
+                const userData = await res.json();
+                localStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+            } catch  {}
+        }
+    }["useAuth.useCallback[refreshUser]"], []);
     const updateProfile = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "useAuth.useCallback[updateProfile]": async (updates)=>{
             setIsLoading(true);
@@ -2310,10 +2342,11 @@ function useAuth() {
         login,
         logout,
         register,
-        updateProfile
+        updateProfile,
+        refreshUser
     };
 }
-_s(useAuth, "gbpnY1EIoj5MWktKXC2atH5rIL0=");
+_s(useAuth, "GepUweAA7QwP2zOOYCN7ZODm9pI=");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

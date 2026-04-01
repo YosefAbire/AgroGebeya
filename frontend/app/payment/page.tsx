@@ -47,7 +47,7 @@ export default function PaymentPage() {
 
   const handlePay = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token || !selectedOrderId) return
+    if (!token || !selectedOrderId) { setError('Please select an order.'); return }
     setProcessing(true)
     setError(null)
     try {
@@ -84,7 +84,7 @@ export default function PaymentPage() {
               <CardHeader><CardTitle>Make Payment</CardTitle><CardDescription>Select an order and payment method</CardDescription></CardHeader>
               <CardContent>
                 {loading ? <LoadingSkeleton type="form" count={3} /> : (
-                  <form onSubmit={handlePay} className="space-y-6">
+                  <form onSubmit={handlePay} noValidate className="space-y-6">
                     <div>
                       <Label htmlFor="order">Select Order</Label>
                       {orders.length === 0 ? (

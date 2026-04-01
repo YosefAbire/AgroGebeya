@@ -1,15 +1,32 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pathlib import Path
 from app.core.config import settings
 from app.api.v1 import api_router
 from app.core.file_storage import ensure_upload_dirs
 
+CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+]
+
 app = FastAPI(
     title="AgroGebeya API",
     description="Backend API for AgroGebeya Agricultural Marketplace",
     version="1.0.0"
+)
+
+# CORS middleware must be added first so headers are present even on error responses
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Ensure upload directories exist
@@ -19,20 +36,6 @@ ensure_upload_dirs()
 uploads_dir = Path("uploads")
 if uploads_dir.exists():
     app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")

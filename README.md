@@ -33,9 +33,9 @@ Each directory has its own README with specific setup instructions.
 
 | Role | Username | Password |
 |------|----------|----------|
-| Farmer | `farmer_demo` | `demo123` |
-| Retailer | `retailer_demo` | `demo123` |
-| Admin | `admin` | `admin123` |
+| Farmer | `farmer_demo` | *(see .env)* |
+| Retailer | `retailer_demo` | *(see .env)* |
+| Admin | `admin` | *(see .env)* |
 
 ## 🚀 Technology Stack
 
@@ -71,7 +71,7 @@ See **[FRONTEND_BACKEND_INTEGRATION.md](FRONTEND_BACKEND_INTEGRATION.md)** for d
 **PostgreSQL Configuration:**
 - Database: `agrogebeya`
 - User: `postgres`
-- Password: `fente`
+- Password: *(set in your `.env` file — never commit real credentials)*
 - Port: `5432`
 
 **Initialize Database:**
@@ -485,4 +485,4 @@ For issues, questions, or suggestions, please refer to the project documentation
 
 ---
 
-**Built with ❤️ for Ethiopian Farmers and Retailers**
+**Built with Love for Ethiopian Farmers and Retailers**

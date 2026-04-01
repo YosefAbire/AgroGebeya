@@ -21,6 +21,8 @@ class VerificationRequestResponse(BaseModel):
     id: int
     user_id: int
     status: str
+    id_front_image_url: Optional[str] = None
+    id_back_image_url: Optional[str] = None
     submitted_at: datetime
     reviewed_at: Optional[datetime] = None
     reviewed_by: Optional[int] = None

@@ -22,6 +22,9 @@ export function useWebSocket({
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const pingIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
+  const reconnectAttemptsRef = useRef(0);
+  const MAX_RECONNECT_ATTEMPTS = 5;
+
   const connect = useCallback(() => {
     if (!token || wsRef.current?.readyState === WebSocket.OPEN) return;
 
@@ -30,7 +33,7 @@ export function useWebSocket({
       const ws = new WebSocket(`${wsUrl}/api/v1/ws/notifications?token=${token}`);
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
+        reconnectAttemptsRef.current = 0;
         setIsConnected(true);
         onConnect?.();
 
@@ -39,7 +42,7 @@ export function useWebSocket({
           if (ws.readyState === WebSocket.OPEN) {
             ws.send('ping');
           }
-        }, 25000); // Ping every 25 seconds
+        }, 25000);
       };
 
       ws.onmessage = (event) => {
@@ -83,28 +86,25 @@ export function useWebSocket({
         }
       };
 
-      ws.onerror = (error) => {
-        // Silently handle WebSocket errors - they're expected when backend is not running
-        console.log('WebSocket connection unavailable');
+      ws.onerror = () => {
+        // Silently handle - expected when backend is unavailable
       };
 
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
+      ws.onclose = (event) => {
         setIsConnected(false);
         onDisconnect?.();
 
-        // Clear ping interval
-        if (pingIntervalRef.current) {
-          clearInterval(pingIntervalRef.current);
-        }
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
 
-        // Attempt to reconnect only if explicitly enabled
-        if (autoReconnect) {
-          reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('Attempting to reconnect...');
-            connect();
-          }, 5000); // Reconnect after 5 seconds
-        }
+        // Don't reconnect on auth failure (4001) or if disabled
+        if (!autoReconnect || event.code === 4001) return;
+
+        reconnectAttemptsRef.current += 1;
+        if (reconnectAttemptsRef.current > MAX_RECONNECT_ATTEMPTS) return;
+
+        // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+        const delay = Math.min(5000 * Math.pow(2, reconnectAttemptsRef.current - 1), 60000);
+        reconnectTimeoutRef.current = setTimeout(connect, delay);
       };
 
       wsRef.current = ws;

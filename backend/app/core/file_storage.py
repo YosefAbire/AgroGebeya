@@ -12,35 +12,40 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 # Create upload directories
 PRODUCT_IMAGES_DIR = UPLOAD_DIR / "products"
 PROFILE_IMAGES_DIR = UPLOAD_DIR / "profiles"
+ID_IMAGES_DIR = UPLOAD_DIR / "id_documents"
 
 def ensure_upload_dirs():
     """Create upload directories if they don't exist"""
     PRODUCT_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
     PROFILE_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+    ID_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 def validate_image_file(file: UploadFile) -> None:
     """Validate uploaded image file"""
-    # Check file extension
-    file_ext = Path(file.filename).suffix.lower()
-    if file_ext not in ALLOWED_IMAGE_EXTENSIONS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}"
-        )
-    
-    # Check content type
-    if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File must be an image"
-        )
+    # Check content type first (more reliable than filename)
+    if file.content_type and file.content_type.startswith("image/"):
+        return  # valid
+
+    # Fall back to extension check
+    if file.filename:
+        file_ext = Path(file.filename).suffix.lower()
+        if file_ext in ALLOWED_IMAGE_EXTENSIONS:
+            return  # valid
+
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}"
+    )
 
 async def save_upload_file(file: UploadFile, directory: Path) -> str:
     """Save uploaded file and return the file path"""
     validate_image_file(file)
     
-    # Generate unique filename
-    file_ext = Path(file.filename).suffix.lower()
+    # Generate unique filename — derive extension from content_type if filename has none
+    file_ext = Path(file.filename).suffix.lower() if file.filename else ''
+    if not file_ext and file.content_type:
+        ct_map = {'image/jpeg': '.jpg', 'image/png': '.png', 'image/gif': '.gif', 'image/webp': '.webp'}
+        file_ext = ct_map.get(file.content_type, '.jpg')
     unique_filename = f"{uuid.uuid4()}{file_ext}"
     file_path = directory / unique_filename
     
@@ -68,6 +73,11 @@ async def save_profile_image(file: UploadFile) -> str:
     """Save profile image and return URL"""
     ensure_upload_dirs()
     return await save_upload_file(file, PROFILE_IMAGES_DIR)
+
+async def save_id_image(file: UploadFile) -> str:
+    """Save national ID document image and return URL"""
+    ensure_upload_dirs()
+    return await save_upload_file(file, ID_IMAGES_DIR)
 
 def delete_file(file_url: str) -> None:
     """Delete a file given its URL"""

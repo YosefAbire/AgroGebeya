@@ -24,7 +24,7 @@ export function VerificationBanner({ token }: VerificationBannerProps) {
   const loadStatus = async () => {
     try {
       const verification = await verificationService.getStatus(token);
-      setStatus(verification.status);
+      setStatus(verification.status as VerificationStatus);
     } catch (error) {
       // User hasn't submitted verification yet
       setStatus(VerificationStatus.UNVERIFIED);

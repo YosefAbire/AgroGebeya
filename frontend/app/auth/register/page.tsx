@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Lock, Mail, User, Phone, MapPin, AlertCircle, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, Lock, Mail, User, Phone, MapPin, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/use-auth'
+import { toast } from 'sonner'
 
 const FEATURES = [
   { icon: '🌾', title: 'For Farmers', desc: 'List your produce, set your price, and sell directly to verified retailers across Ethiopia.' },
@@ -30,7 +31,6 @@ export default function RegisterPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [strength, setStrength] = useState<'weak' | 'medium' | 'strong' | ''>('')
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', role: 'farmer',
@@ -61,6 +61,11 @@ export default function RegisterPage() {
     e.preventDefault()
     if (!formData.agreeToTerms) { setError('Please agree to the Terms of Service'); return }
     if (formData.password !== formData.confirmPassword) { setError('Passwords do not match'); return }
+    if (!formData.name.trim()) { setError('Full name is required'); return }
+    if (!formData.phone.trim()) { setError('Phone number is required'); return }
+    if (!formData.email.trim()) { setError('Email address is required'); return }
+    if (!formData.location.trim()) { setError('Location is required'); return }
+    if (!formData.password) { setError('Password is required'); return }
     setIsLoading(true); setError('')
     try {
       await register({
@@ -69,7 +74,7 @@ export default function RegisterPage() {
         location: formData.location, password: formData.password,
         confirmPassword: formData.confirmPassword,
       })
-      setSuccess('Account created! Redirecting...')
+      toast.success('Account created! Redirecting...')
       const stored = localStorage.getItem('user')
       const role = stored ? JSON.parse(stored).role : null
       router.push(role === 'retailer' ? '/dashboard/retailer' : '/dashboard/farmer')
@@ -174,7 +179,7 @@ export default function RegisterPage() {
             transition-all duration-700 ease-out ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
             style={{ transitionDelay: '400ms' }}
           >
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {/* Role selector — prominent at top */}
               <div className="grid grid-cols-2 gap-3 mb-2">
                 {(['farmer', 'retailer'] as const).map(r => (
@@ -197,7 +202,7 @@ export default function RegisterPage() {
                   <label className="text-sm font-medium">Full Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    <Input name="name" type="text" placeholder="Abebe Girma" value={formData.name}
+                    <Input id="name" name="name" type="text" placeholder="Abebe Girma" value={formData.name}
                       onChange={handleChange} className="pl-9" disabled={isLoading} required />
                   </div>
                 </div>
@@ -205,7 +210,7 @@ export default function RegisterPage() {
                   <label className="text-sm font-medium">Phone</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    <Input name="phone" type="tel" placeholder="+251 9XX XXXXXX" value={formData.phone}
+                    <Input id="phone" name="phone" type="tel" placeholder="+251 9XX XXXXXX" value={formData.phone}
                       onChange={handleChange} className="pl-9" disabled={isLoading} required />
                   </div>
                 </div>
@@ -216,7 +221,7 @@ export default function RegisterPage() {
                 <label className="text-sm font-medium">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <Input name="email" type="email" placeholder="you@example.com" value={formData.email}
+                  <Input id="email" name="email" type="email" placeholder="you@example.com" value={formData.email}
                     onChange={handleChange} className="pl-9" disabled={isLoading} required />
                 </div>
               </div>
@@ -226,7 +231,7 @@ export default function RegisterPage() {
                 <label className="text-sm font-medium">Location / Region</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <Input name="location" type="text" placeholder="e.g., Addis Ababa, Oromia" value={formData.location}
+                  <Input id="location" name="location" type="text" placeholder="e.g., Addis Ababa, Oromia" value={formData.location}
                     onChange={handleChange} className="pl-9" disabled={isLoading} required />
                 </div>
               </div>
@@ -237,8 +242,8 @@ export default function RegisterPage() {
                   <label className="text-sm font-medium">Password</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    <Input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••"
-                      value={formData.password} onChange={handleChange} className="pl-9 pr-9" disabled={isLoading} required />
+                    <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••"
+                      value={formData.password} onChange={handleChange} className="pl-9 pr-9" disabled={isLoading} required autoComplete="new-password" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -257,8 +262,8 @@ export default function RegisterPage() {
                   <label className="text-sm font-medium">Confirm Password</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    <Input name="confirmPassword" type={showConfirm ? 'text' : 'password'} placeholder="••••••••"
-                      value={formData.confirmPassword} onChange={handleChange} className="pl-9 pr-9" disabled={isLoading} required />
+                    <Input id="confirmPassword" name="confirmPassword" type={showConfirm ? 'text' : 'password'} placeholder="••••••••"
+                      value={formData.confirmPassword} onChange={handleChange} className="pl-9 pr-9" disabled={isLoading} required autoComplete="new-password" />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -274,7 +279,7 @@ export default function RegisterPage() {
 
               {/* Terms */}
               <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms}
+                <input id="agreeToTerms" type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms}
                   onChange={handleChange} className="w-4 h-4 accent-primary mt-0.5 flex-shrink-0" disabled={isLoading} />
                 <span className="text-sm text-muted-foreground">
                   I agree to the{' '}
@@ -287,11 +292,6 @@ export default function RegisterPage() {
               {error && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm p-3 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" /><span>{error}</span>
-                </div>
-              )}
-              {success && (
-                <div className="bg-green-50 border border-green-200 rounded text-green-700 text-sm p-3 flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" /><span>{success}</span>
                 </div>
               )}
 

@@ -16,6 +16,8 @@ class VerificationRequest(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True)
     encrypted_national_id = Column(String(255), nullable=False)
+    id_front_image_url = Column(String(500))
+    id_back_image_url = Column(String(500))
     status = Column(String(20), nullable=False, default="pending")
     submitted_at = Column(DateTime(timezone=True), server_default=func.now())
     reviewed_at = Column(DateTime(timezone=True))

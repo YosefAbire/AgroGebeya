@@ -8,9 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { verificationService } from '@/lib/services/verification-service';
 import { VerificationRequest } from '@/lib/types-extended';
-import { ShieldCheck, CheckCircle, XCircle } from 'lucide-react';
+import { ShieldCheck, CheckCircle, XCircle, ImageOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
+import Image from 'next/image';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 export default function AdminVerificationPage() {
   const { token } = useAuth();
@@ -75,10 +78,42 @@ export default function AdminVerificationPage() {
                   <Badge className="bg-yellow-100 text-yellow-800">pending</Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Submitted {formatDistanceToNow(new Date(req.submitted_at), { addSuffix: true })}
                 </p>
+
+                {/* ID Photos */}
+                <div className="grid grid-cols-2 gap-3">
+                  {(['id_front_image_url', 'id_back_image_url'] as const).map((key) => {
+                    const url = (req as any)[key];
+                    const label = key === 'id_front_image_url' ? 'Front of ID' : 'Back of ID';
+                    return (
+                      <div key={key} className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+                        {url ? (
+                          <a href={`${API_BASE_URL}${url}`} target="_blank" rel="noopener noreferrer">
+                            <Image
+                              src={`${API_BASE_URL}${url}`}
+                              alt={label}
+                              width={300}
+                              height={180}
+                              className="w-full rounded-lg border border-border object-cover max-h-44 hover:opacity-90 transition-opacity"
+                            />
+                          </a>
+                        ) : (
+                          <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border text-muted-foreground">
+                            <div className="text-center">
+                              <ImageOff className="h-6 w-6 mx-auto mb-1" />
+                              <p className="text-xs">Not uploaded</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
                 <div className="flex gap-2 items-center">
                   <Input
                     placeholder="Rejection reason (required to reject)"
@@ -86,19 +121,10 @@ export default function AdminVerificationPage() {
                     onChange={e => setRejectReason(prev => ({ ...prev, [req.id]: e.target.value }))}
                     className="flex-1"
                   />
-                  <Button
-                    size="sm"
-                    onClick={() => approve(req.id)}
-                    disabled={actionId === req.id}
-                  >
+                  <Button size="sm" onClick={() => approve(req.id)} disabled={actionId === req.id}>
                     <CheckCircle className="h-4 w-4 mr-1" /> Approve
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => reject(req.id)}
-                    disabled={actionId === req.id}
-                  >
+                  <Button size="sm" variant="destructive" onClick={() => reject(req.id)} disabled={actionId === req.id}>
                     <XCircle className="h-4 w-4 mr-1" /> Reject
                   </Button>
                 </div>

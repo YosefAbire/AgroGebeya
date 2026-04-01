@@ -8,6 +8,7 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) return
     setSent(true)
   }
 
@@ -48,11 +49,13 @@ export default function ContactPage() {
                 <p className="text-muted-foreground text-sm">We'll get back to you within 24 hours.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 {(['name', 'email', 'subject'] as const).map(field => (
                   <div key={field} className="space-y-1">
-                    <label className="text-sm font-medium capitalize">{field}</label>
+                    <label htmlFor={field} className="text-sm font-medium capitalize">{field}</label>
                     <input
+                      id={field}
+                      name={field}
                       type={field === 'email' ? 'email' : 'text'}
                       required
                       value={form[field]}
@@ -62,8 +65,10 @@ export default function ContactPage() {
                   </div>
                 ))}
                 <div className="space-y-1">
-                  <label className="text-sm font-medium">Message</label>
+                  <label htmlFor="message" className="text-sm font-medium">Message</label>
                   <textarea
+                    id="message"
+                    name="message"
                     required rows={4}
                     value={form.message}
                     onChange={e => setForm(p => ({ ...p, message: e.target.value }))}

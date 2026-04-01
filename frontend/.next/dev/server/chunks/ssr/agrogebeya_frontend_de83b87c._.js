@@ -449,13 +449,15 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
     const wsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const reconnectTimeoutRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(undefined);
     const pingIntervalRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(undefined);
+    const reconnectAttemptsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(0);
+    const MAX_RECONNECT_ATTEMPTS = 5;
     const connect = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(()=>{
         if (!token || wsRef.current?.readyState === WebSocket.OPEN) return;
         try {
             const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000';
             const ws = new WebSocket(`${wsUrl}/api/v1/ws/notifications?token=${token}`);
             ws.onopen = ()=>{
-                console.log('WebSocket connected');
+                reconnectAttemptsRef.current = 0;
                 setIsConnected(true);
                 onConnect?.();
                 // Start ping interval to keep connection alive
@@ -463,7 +465,7 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                     if (ws.readyState === WebSocket.OPEN) {
                         ws.send('ping');
                     }
-                }, 25000); // Ping every 25 seconds
+                }, 25000);
             };
             ws.onmessage = (event)=>{
                 try {
@@ -498,25 +500,20 @@ function useWebSocket({ token, onNotification, onConnect, onDisconnect, autoReco
                     console.error('Error parsing WebSocket message:', error);
                 }
             };
-            ws.onerror = (error)=>{
-                // Silently handle WebSocket errors - they're expected when backend is not running
-                console.log('WebSocket connection unavailable');
+            ws.onerror = ()=>{
+            // Silently handle - expected when backend is unavailable
             };
-            ws.onclose = ()=>{
-                console.log('WebSocket disconnected');
+            ws.onclose = (event)=>{
                 setIsConnected(false);
                 onDisconnect?.();
-                // Clear ping interval
-                if (pingIntervalRef.current) {
-                    clearInterval(pingIntervalRef.current);
-                }
-                // Attempt to reconnect only if explicitly enabled
-                if (autoReconnect) {
-                    reconnectTimeoutRef.current = setTimeout(()=>{
-                        console.log('Attempting to reconnect...');
-                        connect();
-                    }, 5000); // Reconnect after 5 seconds
-                }
+                if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+                // Don't reconnect on auth failure (4001) or if disabled
+                if (!autoReconnect || event.code === 4001) return;
+                reconnectAttemptsRef.current += 1;
+                if (reconnectAttemptsRef.current > MAX_RECONNECT_ATTEMPTS) return;
+                // Exponential backoff: 5s, 10s, 20s, 40s, 80s
+                const delay = Math.min(5000 * Math.pow(2, reconnectAttemptsRef.current - 1), 60000);
+                reconnectTimeoutRef.current = setTimeout(connect, delay);
             };
             wsRef.current = ws;
         } catch (error) {
@@ -1346,6 +1343,7 @@ function ProductDetailsPage({ params }) {
     const [quantity, setQuantity] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(1);
     const [deliveryDate, setDeliveryDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
     const [product, setProduct] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [activeImage, setActiveImage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [submitting, setSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showContactForm, setShowContactForm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -1359,6 +1357,14 @@ function ProductDetailsPage({ params }) {
         try {
             const data = await __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$product$2d$service$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["productService"].getProduct(Number(id), token ?? undefined);
             setProduct(data);
+            // Set initial active image to primary or first
+            if (data.images?.length) {
+                const primary = data.images.find((img)=>img.is_primary) || data.images[0];
+                const url = primary.image_url.startsWith('http') ? primary.image_url : `http://127.0.0.1:8000${primary.image_url}`;
+                setActiveImage(url);
+            } else if (data.image_url) {
+                setActiveImage(data.image_url.startsWith('http') ? data.image_url : `http://127.0.0.1:8000${data.image_url}`);
+            }
         } catch (error) {
             __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toast"].error('Failed to load product');
             console.error(error);
@@ -1417,7 +1423,7 @@ function ProductDetailsPage({ params }) {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$Header$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                    lineNumber: 98,
+                    lineNumber: 107,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1427,18 +1433,18 @@ function ProductDetailsPage({ params }) {
                         children: "Loading product..."
                     }, void 0, false, {
                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                        lineNumber: 100,
+                        lineNumber: 109,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                    lineNumber: 99,
+                    lineNumber: 108,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-            lineNumber: 97,
+            lineNumber: 106,
             columnNumber: 7
         }, this);
     }
@@ -1448,7 +1454,7 @@ function ProductDetailsPage({ params }) {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$Header$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                    lineNumber: 109,
+                    lineNumber: 118,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1458,18 +1464,18 @@ function ProductDetailsPage({ params }) {
                         children: "Product not found"
                     }, void 0, false, {
                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                        lineNumber: 111,
+                        lineNumber: 120,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                    lineNumber: 110,
+                    lineNumber: 119,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-            lineNumber: 108,
+            lineNumber: 117,
             columnNumber: 7
         }, this);
     }
@@ -1478,7 +1484,7 @@ function ProductDetailsPage({ params }) {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$Header$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                lineNumber: 119,
+                lineNumber: 128,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -1492,14 +1498,14 @@ function ProductDetailsPage({ params }) {
                                 className: "h-5 w-5"
                             }, void 0, false, {
                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                lineNumber: 127,
+                                lineNumber: 136,
                                 columnNumber: 11
                             }, this),
                             "Back to Products"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                        lineNumber: 123,
+                        lineNumber: 132,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1507,37 +1513,38 @@ function ProductDetailsPage({ params }) {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "lg:col-span-1",
-                                children: product.images && product.images.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "space-y-4",
+                                children: activeImage ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "space-y-3",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "rounded-lg border border-border bg-secondary h-96 overflow-hidden",
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                                src: (()=>{
-                                                    const primaryImage = product.images.find((img)=>img.is_primary)?.image_url || product.images[0]?.image_url;
-                                                    return primaryImage?.startsWith('http') ? primaryImage : `http://127.0.0.1:8000${primaryImage}`;
-                                                })(),
+                                                src: activeImage,
                                                 alt: product.name,
                                                 width: 400,
                                                 height: 400,
-                                                className: "w-full h-full object-cover",
+                                                className: "w-full h-full object-cover transition-opacity duration-200",
                                                 unoptimized: true
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 138,
+                                                lineNumber: 147,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                            lineNumber: 137,
+                                            lineNumber: 146,
                                             columnNumber: 17
                                         }, this),
-                                        product.images.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        product.images?.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "grid grid-cols-4 gap-2",
-                                            children: product.images.map((img, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "relative aspect-square rounded-lg border border-border overflow-hidden cursor-pointer hover:border-primary transition-colors",
+                                            children: product.images.map((img, idx)=>{
+                                                const url = img.image_url.startsWith('http') ? img.image_url : `http://127.0.0.1:8000${img.image_url}`;
+                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    type: "button",
+                                                    onClick: ()=>setActiveImage(url),
+                                                    className: `relative aspect-square rounded-lg border-2 overflow-hidden transition-colors ${activeImage === url ? 'border-primary' : 'border-border hover:border-primary/50'}`,
                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                                        src: img.image_url.startsWith('http') ? img.image_url : `http://127.0.0.1:8000${img.image_url}`,
+                                                        src: url,
                                                         alt: `${product.name} ${idx + 1}`,
                                                         fill: true,
                                                         className: "object-cover",
@@ -1545,13 +1552,14 @@ function ProductDetailsPage({ params }) {
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
                                                         lineNumber: 158,
-                                                        columnNumber: 25
+                                                        columnNumber: 27
                                                     }, this)
                                                 }, img.id || idx, false, {
                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                    lineNumber: 154,
-                                                    columnNumber: 23
-                                                }, this))
+                                                    lineNumber: 156,
+                                                    columnNumber: 25
+                                                }, this);
+                                            })
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
                                             lineNumber: 152,
@@ -1560,28 +1568,10 @@ function ProductDetailsPage({ params }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                    lineNumber: 135,
-                                    columnNumber: 15
-                                }, this) : product.image_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "rounded-lg border border-border bg-secondary h-96 overflow-hidden",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                        src: product.image_url.startsWith('http') ? product.image_url : `http://127.0.0.1:8000${product.image_url}`,
-                                        alt: product.name,
-                                        width: 400,
-                                        height: 400,
-                                        className: "w-full h-full object-cover",
-                                        unoptimized: true
-                                    }, void 0, false, {
-                                        fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 172,
-                                        columnNumber: 17
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                    lineNumber: 171,
+                                    lineNumber: 144,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "rounded-lg border border-border bg-secondary h-96 flex items-center justify-center overflow-hidden",
+                                    className: "rounded-lg border border-border bg-secondary h-96 flex items-center justify-center",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "text-center text-muted-foreground",
                                         children: [
@@ -1590,7 +1580,7 @@ function ProductDetailsPage({ params }) {
                                                 children: "📦"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 184,
+                                                lineNumber: 168,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1598,23 +1588,23 @@ function ProductDetailsPage({ params }) {
                                                 children: product.category
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 185,
+                                                lineNumber: 169,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 183,
+                                        lineNumber: 167,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                    lineNumber: 182,
+                                    lineNumber: 166,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                lineNumber: 133,
+                                lineNumber: 142,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1631,7 +1621,7 @@ function ProductDetailsPage({ params }) {
                                                             children: product.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 197,
+                                                            lineNumber: 181,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1639,18 +1629,18 @@ function ProductDetailsPage({ params }) {
                                                             children: product.category
                                                         }, void 0, false, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 198,
+                                                            lineNumber: 182,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                    lineNumber: 196,
+                                                    lineNumber: 180,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 195,
+                                                lineNumber: 179,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1664,7 +1654,7 @@ function ProductDetailsPage({ params }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 204,
+                                                        lineNumber: 188,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1676,12 +1666,12 @@ function ProductDetailsPage({ params }) {
                                                                 children: "⭐"
                                                             }, i, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 207,
+                                                                lineNumber: 191,
                                                                 columnNumber: 21
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 205,
+                                                        lineNumber: 189,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1693,19 +1683,19 @@ function ProductDetailsPage({ params }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 215,
+                                                        lineNumber: 199,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 203,
+                                                lineNumber: 187,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 194,
+                                        lineNumber: 178,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1720,7 +1710,7 @@ function ProductDetailsPage({ params }) {
                                                             children: "Price per Unit"
                                                         }, void 0, false, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 223,
+                                                            lineNumber: 207,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1736,19 +1726,19 @@ function ProductDetailsPage({ params }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                    lineNumber: 225,
+                                                                    lineNumber: 209,
                                                                     columnNumber: 37
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 224,
+                                                            lineNumber: 208,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                    lineNumber: 222,
+                                                    lineNumber: 206,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1758,7 +1748,7 @@ function ProductDetailsPage({ params }) {
                                                             children: "Availability"
                                                         }, void 0, false, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 230,
+                                                            lineNumber: 214,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1771,7 +1761,7 @@ function ProductDetailsPage({ params }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 231,
+                                                            lineNumber: 215,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1783,29 +1773,29 @@ function ProductDetailsPage({ params }) {
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 235,
+                                                                lineNumber: 219,
                                                                 columnNumber: 21
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 234,
+                                                            lineNumber: 218,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                    lineNumber: 229,
+                                                    lineNumber: 213,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                            lineNumber: 221,
+                                            lineNumber: 205,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 220,
+                                        lineNumber: 204,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1816,7 +1806,7 @@ function ProductDetailsPage({ params }) {
                                                 children: "Farmer Information"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 246,
+                                                lineNumber: 230,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1829,7 +1819,7 @@ function ProductDetailsPage({ params }) {
                                                                 className: "h-5 w-5 text-muted-foreground"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 249,
+                                                                lineNumber: 233,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1839,7 +1829,7 @@ function ProductDetailsPage({ params }) {
                                                                         children: "Farmer"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 251,
+                                                                        lineNumber: 235,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1850,19 +1840,19 @@ function ProductDetailsPage({ params }) {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 252,
+                                                                        lineNumber: 236,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 250,
+                                                                lineNumber: 234,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 248,
+                                                        lineNumber: 232,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1872,7 +1862,7 @@ function ProductDetailsPage({ params }) {
                                                                 className: "h-5 w-5 text-muted-foreground"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 256,
+                                                                lineNumber: 240,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1882,7 +1872,7 @@ function ProductDetailsPage({ params }) {
                                                                         children: "Location"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 258,
+                                                                        lineNumber: 242,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1890,19 +1880,19 @@ function ProductDetailsPage({ params }) {
                                                                         children: product.location
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 259,
+                                                                        lineNumber: 243,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 257,
+                                                                lineNumber: 241,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 255,
+                                                        lineNumber: 239,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1912,7 +1902,7 @@ function ProductDetailsPage({ params }) {
                                                                 className: "h-5 w-5 text-muted-foreground"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 263,
+                                                                lineNumber: 247,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1922,7 +1912,7 @@ function ProductDetailsPage({ params }) {
                                                                         children: "Delivery Available"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 265,
+                                                                        lineNumber: 249,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1930,25 +1920,25 @@ function ProductDetailsPage({ params }) {
                                                                         children: "Yes, same city or nearby regions"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 266,
+                                                                        lineNumber: 250,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 264,
+                                                                lineNumber: 248,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 262,
+                                                        lineNumber: 246,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 247,
+                                                lineNumber: 231,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1957,7 +1947,7 @@ function ProductDetailsPage({ params }) {
                                                 children: "Contact Farmer"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 271,
+                                                lineNumber: 255,
                                                 columnNumber: 15
                                             }, this),
                                             showContactForm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1971,7 +1961,7 @@ function ProductDetailsPage({ params }) {
                                                         rows: 4
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 280,
+                                                        lineNumber: 264,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1983,7 +1973,7 @@ function ProductDetailsPage({ params }) {
                                                                 children: "Send Message"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 288,
+                                                                lineNumber: 272,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1992,25 +1982,25 @@ function ProductDetailsPage({ params }) {
                                                                 children: "Cancel"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 294,
+                                                                lineNumber: 278,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 287,
+                                                        lineNumber: 271,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 279,
+                                                lineNumber: 263,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 245,
+                                        lineNumber: 229,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2021,7 +2011,7 @@ function ProductDetailsPage({ params }) {
                                                 children: "Place Your Order"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 307,
+                                                lineNumber: 291,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2039,7 +2029,7 @@ function ProductDetailsPage({ params }) {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 312,
+                                                                lineNumber: 296,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2051,7 +2041,7 @@ function ProductDetailsPage({ params }) {
                                                                         children: "−"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 316,
+                                                                        lineNumber: 300,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2064,7 +2054,7 @@ function ProductDetailsPage({ params }) {
                                                                         className: "w-20 rounded-lg border border-border bg-card px-3 py-2 text-center text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 322,
+                                                                        lineNumber: 306,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2073,7 +2063,7 @@ function ProductDetailsPage({ params }) {
                                                                         children: "+"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 331,
+                                                                        lineNumber: 315,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2087,19 +2077,19 @@ function ProductDetailsPage({ params }) {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                        lineNumber: 337,
+                                                                        lineNumber: 321,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 315,
+                                                                lineNumber: 299,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 311,
+                                                        lineNumber: 295,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2110,7 +2100,7 @@ function ProductDetailsPage({ params }) {
                                                                 children: "Preferred Delivery Date"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 343,
+                                                                lineNumber: 327,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2122,13 +2112,13 @@ function ProductDetailsPage({ params }) {
                                                                 className: "mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                lineNumber: 346,
+                                                                lineNumber: 330,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 342,
+                                                        lineNumber: 326,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2141,7 +2131,7 @@ function ProductDetailsPage({ params }) {
                                                                     children: "Order Total:"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                    lineNumber: 359,
+                                                                    lineNumber: 343,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2152,18 +2142,18 @@ function ProductDetailsPage({ params }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                    lineNumber: 360,
+                                                                    lineNumber: 344,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                            lineNumber: 358,
+                                                            lineNumber: 342,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 357,
+                                                        lineNumber: 341,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2180,7 +2170,7 @@ function ProductDetailsPage({ params }) {
                                                                     className: "h-5 w-5"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                                    lineNumber: 378,
+                                                                    lineNumber: 362,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 "Place Order"
@@ -2188,7 +2178,7 @@ function ProductDetailsPage({ params }) {
                                                         }, void 0, true)
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 367,
+                                                        lineNumber: 351,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2196,31 +2186,31 @@ function ProductDetailsPage({ params }) {
                                                         children: "By placing an order, you agree to our terms and conditions"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 384,
+                                                        lineNumber: 368,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 309,
+                                                lineNumber: 293,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 306,
+                                        lineNumber: 290,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                lineNumber: 192,
+                                lineNumber: 176,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                        lineNumber: 131,
+                        lineNumber: 140,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2231,7 +2221,7 @@ function ProductDetailsPage({ params }) {
                                 children: "Product Description"
                             }, void 0, false, {
                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                lineNumber: 394,
+                                lineNumber: 378,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2239,7 +2229,7 @@ function ProductDetailsPage({ params }) {
                                 children: product.description
                             }, void 0, false, {
                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                lineNumber: 395,
+                                lineNumber: 379,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2250,7 +2240,7 @@ function ProductDetailsPage({ params }) {
                                         children: "Product Details"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 398,
+                                        lineNumber: 382,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2264,7 +2254,7 @@ function ProductDetailsPage({ params }) {
                                                         children: "Category"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 401,
+                                                        lineNumber: 385,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2272,13 +2262,13 @@ function ProductDetailsPage({ params }) {
                                                         children: product.category
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 402,
+                                                        lineNumber: 386,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 400,
+                                                lineNumber: 384,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2289,7 +2279,7 @@ function ProductDetailsPage({ params }) {
                                                         children: "Unit"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 405,
+                                                        lineNumber: 389,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2297,13 +2287,13 @@ function ProductDetailsPage({ params }) {
                                                         children: product.unit
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 406,
+                                                        lineNumber: 390,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 404,
+                                                lineNumber: 388,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2314,7 +2304,7 @@ function ProductDetailsPage({ params }) {
                                                         children: "Location"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 409,
+                                                        lineNumber: 393,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2322,13 +2312,13 @@ function ProductDetailsPage({ params }) {
                                                         children: product.location
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 410,
+                                                        lineNumber: 394,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 408,
+                                                lineNumber: 392,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2339,7 +2329,7 @@ function ProductDetailsPage({ params }) {
                                                         children: "Available Quantity"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 413,
+                                                        lineNumber: 397,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2351,43 +2341,43 @@ function ProductDetailsPage({ params }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                        lineNumber: 414,
+                                                        lineNumber: 398,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                                lineNumber: 412,
+                                                lineNumber: 396,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                        lineNumber: 399,
+                                        lineNumber: 383,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                                lineNumber: 397,
+                                lineNumber: 381,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                        lineNumber: 393,
+                        lineNumber: 377,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-                lineNumber: 121,
+                lineNumber: 130,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/agrogebeya/frontend/app/product/[id]/page.tsx",
-        lineNumber: 118,
+        lineNumber: 127,
         columnNumber: 5
     }, this);
 }

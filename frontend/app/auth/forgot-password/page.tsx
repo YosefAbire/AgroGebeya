@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
 
         {/* Form Card */}
         <div className="bg-card rounded-lg shadow-lg p-8 border border-border">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-foreground">

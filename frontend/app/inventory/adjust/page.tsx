@@ -61,7 +61,7 @@ export default function InventoryAdjustmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedProduct || !quantity || !token) return
+    if (!selectedProduct || !quantity || !token) { setError('Please select a product and enter a quantity.'); return }
 
     try {
       setSubmitting(true)
@@ -162,7 +162,7 @@ export default function InventoryAdjustmentPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} noValidate className="space-y-6">
                 {/* Product Selection */}
                 <div>
                   <Label htmlFor="product">Select Product</Label>

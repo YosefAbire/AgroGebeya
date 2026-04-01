@@ -170,7 +170,7 @@ export default function NewOrderPage() {
                 <CardDescription>Provide order information and select products</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} noValidate className="space-y-6">
                   {/* Delivery Information */}
                   <div className="space-y-3">
                     <h3 className="font-medium text-foreground">Delivery Information</h3>

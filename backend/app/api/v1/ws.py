@@ -75,40 +75,21 @@ async def websocket_notifications(
     websocket: WebSocket,
     token: str
 ):
-    """
-    WebSocket endpoint for real-time notifications
-    
-    Usage:
-    - Connect: ws://localhost:8000/api/v1/ws/notifications?token=<jwt_token>
-    - Receive: JSON messages with notification data
-    - Send: Ping messages to keep connection alive
-    
-    Message format:
-    {
-        "type": "notification",
-        "data": {
-            "id": 123,
-            "type": "order_status_changed",
-            "title": "Order Updated",
-            "message": "Your order #456 status changed to shipped",
-            "created_at": "2024-01-15T10:30:00Z",
-            "is_read": false
-        }
-    }
-    """
-    
-    # Create database session manually for WebSocket
     from app.core.database import AsyncSessionLocal
     async with AsyncSessionLocal() as db:
-        # Authenticate user
+        # Accept first, then authenticate — avoids 403 spam
+        await websocket.accept()
         try:
-            user = await get_user_from_websocket(websocket, token, db)
+            user = await get_current_user_from_token(token, db)
         except Exception:
+            await websocket.close(code=4001, reason="Unauthorized")
             return
         
-        # Connect user
-        await manager.connect(websocket, user.id)
-        
+        # Register connection (already accepted above)
+        if user.id not in manager.active_connections:
+            manager.active_connections[user.id] = set()
+        manager.active_connections[user.id].add(websocket)
+
         try:
             # Send initial connection success message
             await websocket.send_json({

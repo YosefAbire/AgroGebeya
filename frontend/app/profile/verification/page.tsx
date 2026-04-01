@@ -145,6 +145,11 @@ export default function VerificationPage() {
           <VerificationForm token={token} onSuccess={handleSuccess} />
         )}
 
+        {/* Pending — allow uploading photos if not done yet */}
+        {!loading && token && verification?.status === VerificationStatus.PENDING && (
+          <VerificationForm token={token} onSuccess={handleSuccess} pendingPhotosOnly />
+        )}
+
         {/* Already verified */}
         {!loading && verification?.status === VerificationStatus.VERIFIED && (
           <div className="text-center py-8">
@@ -157,9 +162,9 @@ export default function VerificationPage() {
           </div>
         )}
 
-        {/* Pending — no form */}
-        {!loading && verification?.status === VerificationStatus.PENDING && (
-          <div className="text-center py-6">
+        {/* Support link */}
+        {!loading && (
+          <div className="text-center py-2">
             <p className="text-sm text-muted-foreground">
               Need help? Contact support at{' '}
               <a href="mailto:support@agrogebeya.com" className="text-primary hover:underline">

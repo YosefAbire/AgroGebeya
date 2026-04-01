@@ -3277,6 +3277,12 @@ const configEnv = ("TURBOPACK compile-time value", {
             "hostname": ("TURBOPACK compile-time value", "localhost"),
             "port": ("TURBOPACK compile-time value", "8000"),
             "pathname": ("TURBOPACK compile-time value", "/uploads/**")
+        }),
+        ("TURBOPACK compile-time value", {
+            "protocol": ("TURBOPACK compile-time value", "http"),
+            "hostname": ("TURBOPACK compile-time value", "127.0.0.1"),
+            "port": ("TURBOPACK compile-time value", "8000"),
+            "pathname": ("TURBOPACK compile-time value", "/uploads/**")
         })
     ]),
     "localPatterns": ("TURBOPACK compile-time value", [
@@ -3637,6 +3643,12 @@ function getImageProps(imgProps) {
                 ("TURBOPACK compile-time value", {
                     "protocol": ("TURBOPACK compile-time value", "http"),
                     "hostname": ("TURBOPACK compile-time value", "localhost"),
+                    "port": ("TURBOPACK compile-time value", "8000"),
+                    "pathname": ("TURBOPACK compile-time value", "/uploads/**")
+                }),
+                ("TURBOPACK compile-time value", {
+                    "protocol": ("TURBOPACK compile-time value", "http"),
+                    "hostname": ("TURBOPACK compile-time value", "127.0.0.1"),
                     "port": ("TURBOPACK compile-time value", "8000"),
                     "pathname": ("TURBOPACK compile-time value", "/uploads/**")
                 })

@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Save, X } from 'lucide-react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { productService } from '@/lib/product-service'
 import { LoadingSkeleton } from '@/components/common/LoadingSkeleton'
+import { toast } from 'sonner'
 
 export default function EditProductPage() {
   const params = useParams()
@@ -19,7 +20,6 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showSuccess, setShowSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -63,11 +63,13 @@ export default function EditProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
+    if (!formData.name.trim()) { setError('Product name is required'); return }
+    if (!formData.price || formData.price <= 0) { setError('A valid price is required'); return }
     setIsSaving(true)
     try {
       await productService.updateProduct(productId, formData, token)
-      setShowSuccess(true)
-      setTimeout(() => router.push('/products/manage'), 1500)
+      toast.success('Product updated successfully!')
+      setTimeout(() => router.push('/products/manage'), 1000)
     } catch {
       setError('Failed to save changes.')
     } finally {
@@ -100,7 +102,7 @@ export default function EditProductPage() {
           <p className="text-muted-foreground">Update product information and details</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} noValidate className="space-y-6">
           <div className="bg-card rounded-lg border border-border p-6 space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Basic Information</h2>
             <div>
@@ -156,13 +158,6 @@ export default function EditProductPage() {
 
           {error && (
             <div className="bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm p-3">{error}</div>
-          )}
-
-          {showSuccess && (
-            <div className="bg-green-50 border border-green-200 rounded text-green-700 text-sm p-4 flex items-center justify-between">
-              <span>Product updated successfully!</span>
-              <button type="button" onClick={() => setShowSuccess(false)}><X className="w-4 h-4" /></button>
-            </div>
           )}
 
           <div className="flex gap-4">

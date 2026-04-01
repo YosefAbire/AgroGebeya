@@ -26,6 +26,7 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   register: (userData: Partial<User> & { password: string; confirmPassword: string }) => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 // --- Utility: check if token expired ---
@@ -187,6 +188,20 @@ export function useAuth(): AuthContextType {
     [login]
   );
 
+  const refreshUser = useCallback(async () => {
+    const storedToken = localStorage.getItem('authToken')
+    if (!storedToken) return
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      })
+      if (!res.ok) return
+      const userData = await res.json()
+      localStorage.setItem('user', JSON.stringify(userData))
+      setUser(userData)
+    } catch {}
+  }, [])
+
   const updateProfile = useCallback(async (updates: Partial<User>) => {
     setIsLoading(true);
     try {
@@ -212,5 +227,6 @@ export function useAuth(): AuthContextType {
     logout,
     register,
     updateProfile,
+    refreshUser,
   };
 }

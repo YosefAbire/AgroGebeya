@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Lock, User, AlertCircle, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, Lock, User, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/use-auth'
+import { toast } from 'sonner'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -14,7 +15,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
@@ -35,14 +35,12 @@ export default function LoginPage() {
       [name]: type === 'checkbox' ? checked : value,
     }))
     if (error) setError('')
-    if (success) setSuccess('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-    setSuccess('')
 
     try {
       // Validation
@@ -57,7 +55,7 @@ export default function LoginPage() {
       // Call backend API
       await login(formData.username, formData.password)
 
-      setSuccess('Login successful! Redirecting...')
+      toast.success('Login successful! Redirecting...')
 
       // Read role directly from localStorage (set by login()) to avoid state race
       const storedUser = localStorage.getItem('user')
@@ -79,7 +77,6 @@ export default function LoginPage() {
 
   const handleDemoLogin = async (username: string, password = 'password123') => {
     setError('')
-    setSuccess('')
     setIsLoading(true)
     try {
       await login(username, password)
@@ -191,7 +188,7 @@ export default function LoginPage() {
             ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
             style={{ transitionDelay: '400ms' }}
           >
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               {/* Username Field */}
               <div className="space-y-2">
                 <label htmlFor="username" className="block text-sm font-medium text-foreground">
@@ -209,6 +206,7 @@ export default function LoginPage() {
                     className="pl-10"
                     disabled={isLoading}
                     required
+                    autoComplete="username"
                   />
                 </div>
               </div>
@@ -230,6 +228,7 @@ export default function LoginPage() {
                     className="pl-10 pr-10"
                     disabled={isLoading}
                     required
+                    autoComplete="current-password"
                   />
                   <button
                     type="button"
@@ -265,12 +264,6 @@ export default function LoginPage() {
                 <div className="bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm p-3 flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <span>{error}</span>
-                </div>
-              )}
-              {success && (
-                <div className="bg-green-50 border border-green-200 rounded text-green-700 text-sm p-3 flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>{success}</span>
                 </div>
               )}
 

@@ -26,7 +26,7 @@ class UploadService {
     formData.append('file', file)
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/products/${productId}/images?is_primary=${isPrimary}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/uploads/products/${productId}/images?is_primary=${isPrimary}`,
       {
         method: 'POST',
         headers: {
@@ -55,7 +55,7 @@ class UploadService {
    */
   async deleteProductImage(imageId: number, token: string): Promise<void> {
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/products/images/${imageId}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/uploads/products/images/${imageId}`,
       {
         method: 'DELETE',
         headers: {
@@ -73,34 +73,28 @@ class UploadService {
     formData.append('file', file)
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/profile/image`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/uploads/profile/image`,
       {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       }
     )
 
     if (!response.ok) {
-      throw new Error('Failed to upload profile image')
+      const err = await response.json().catch(() => ({}))
+      throw new Error((err as any).detail || 'Failed to upload profile image')
     }
 
     return response.json()
   }
 
-  /**
-   * Delete profile image
-   */
   async deleteProfileImage(token: string): Promise<void> {
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/uploads/profile/image`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/uploads/profile/image`,
       {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       }
     )
   }

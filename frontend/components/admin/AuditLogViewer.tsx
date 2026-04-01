@@ -65,7 +65,7 @@ export function AuditLogViewer({ token }: AuditLogViewerProps) {
       <CardContent>
         {tab === 'logs' && (
           <div className="flex gap-2 mb-4">
-            <Input placeholder="Filter by action..." value={actionType} onChange={e => setActionType(e.target.value)} className="max-w-xs" />
+            <Input id="auditActionFilter" name="auditActionFilter" placeholder="Filter by action..." value={actionType} onChange={e => setActionType(e.target.value)} className="max-w-xs" />
             <Button size="sm" onClick={load}><Search className="h-4 w-4" /></Button>
           </div>
         )}
