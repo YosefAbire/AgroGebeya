@@ -9,13 +9,19 @@ import OrderList from '@/components/OrderList'
 import { VerificationBanner } from '@/components/verification/VerificationBanner'
 import { useAuth } from '@/hooks/use-auth'
 import { dashboardService, DashboardStats, RecentOrder } from '@/lib/services/dashboard-service'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function FarmerDashboard() {
   const { user, token } = useAuth()
+  const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (user && user.role !== 'farmer') { router.replace('/dashboard'); return }
+  }, [user, router])
 
   useEffect(() => {
     if (token) {

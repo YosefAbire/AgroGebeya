@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, TrendingUp, TrendingDown, ShoppingCart, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { dashboardService } from '@/lib/services/dashboard-service'
 import { productService } from '@/lib/product-service'
@@ -12,12 +13,17 @@ import { LoadingSkeleton } from '@/components/common/LoadingSkeleton'
 import { EmptyState } from '@/components/common/EmptyState'
 
 export default function ProductAnalyticsPage() {
-  const { token } = useAuth()
+  const { user, token } = useAuth()
+  const router = useRouter()
   const [timeRange, setTimeRange] = useState('30d')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [stats, setStats] = useState<{ total_products?: number; total_earnings?: number; pending_orders?: number } | null>(null)
+
+  useEffect(() => {
+    if (user && user.role !== 'farmer') { router.replace('/dashboard'); return }
+  }, [user, router])
 
   const loadData = useCallback(async () => {
     if (!token) return

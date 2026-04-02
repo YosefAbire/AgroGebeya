@@ -65,7 +65,8 @@ export function ReportGenerator({ token }: ReportGeneratorProps) {
       setReportData(data);
       toast.success('Report generated successfully');
     } catch (err: any) {
-      setError(err.message || 'Failed to generate report');
+      const msg = typeof err.message === 'string' ? err.message : JSON.stringify(err);
+      setError(msg);
       toast.error('Failed to generate report');
     } finally {
       setLoading(false);

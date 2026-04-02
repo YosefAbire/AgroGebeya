@@ -297,62 +297,44 @@ const userManagementService = {
 const reportsService = {
     // Orders report
     getOrdersReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        // Append as ISO datetime strings only when provided
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/orders?${params}`, token);
     },
     // Revenue report
     getRevenueReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/revenue?${params}`, token);
     },
     // Users report
     getUsersReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/users?${params}`, token);
     },
-    // Payments report
+    // Payments report — backend takes `days` not date range
     getPaymentsReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
-        return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/payments?${params}`, token);
+        // Calculate days from date range, default 30
+        let days = 30;
+        if (startDate && endDate) {
+            const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
+            days = Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)));
+        } else if (startDate) {
+            const diff = Date.now() - new Date(startDate).getTime();
+            days = Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)));
+        }
+        return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/payments?days=${days}`, token);
     },
     // Transport report
     getTransportReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/transport?${params}`, token);
     },
     // Dashboard metrics
@@ -361,7 +343,7 @@ const reportsService = {
     },
     // Export data
     exportData: async (type, token, format = 'csv')=>{
-        const response = await fetch(`${("TURBOPACK compile-time value", "http://127.0.0.1:8000") || 'http://127.0.0.1:8000'}/api/v1/admin/export/${type}?format=${format}`, {
+        const response = await fetch(`${("TURBOPACK compile-time value", "http://127.0.0.1:8000") || 'http://127.0.0.1:8000'}/api/v1/admin/reports/export/${type}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`
@@ -597,11 +579,9 @@ function AdminDashboardPage() {
         }, this);
     }
     const fmt = (n)=>n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
-    const fmtCurrency = (n)=>new Intl.NumberFormat('en-ET', {
-            style: 'currency',
-            currency: 'ETB',
+    const fmtCurrency = (n)=>`${new Intl.NumberFormat('en-ET', {
             maximumFractionDigits: 0
-        }).format(n);
+        }).format(n)} ETB`;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "container mx-auto py-8 px-4 space-y-8",
         children: [

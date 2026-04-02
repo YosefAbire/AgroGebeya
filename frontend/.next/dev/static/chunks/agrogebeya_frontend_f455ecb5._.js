@@ -927,62 +927,44 @@ const userManagementService = {
 const reportsService = {
     // Orders report
     getOrdersReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        // Append as ISO datetime strings only when provided
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/orders?${params}`, token);
     },
     // Revenue report
     getRevenueReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/revenue?${params}`, token);
     },
     // Users report
     getUsersReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/users?${params}`, token);
     },
-    // Payments report
+    // Payments report — backend takes `days` not date range
     getPaymentsReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
-        return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/payments?${params}`, token);
+        // Calculate days from date range, default 30
+        let days = 30;
+        if (startDate && endDate) {
+            const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
+            days = Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)));
+        } else if (startDate) {
+            const diff = Date.now() - new Date(startDate).getTime();
+            days = Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)));
+        }
+        return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/payments?days=${days}`, token);
     },
     // Transport report
     getTransportReport: async (token, startDate, endDate)=>{
-        const params = new URLSearchParams({
-            ...startDate && {
-                start_date: startDate
-            },
-            ...endDate && {
-                end_date: endDate
-            }
-        });
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', `${startDate}T00:00:00`);
+        if (endDate) params.append('end_date', `${endDate}T23:59:59`);
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get(`/api/v1/admin/reports/transport?${params}`, token);
     },
     // Dashboard metrics
@@ -991,7 +973,7 @@ const reportsService = {
     },
     // Export data
     exportData: async (type, token, format = 'csv')=>{
-        const response = await fetch(`${("TURBOPACK compile-time value", "http://127.0.0.1:8000") || 'http://127.0.0.1:8000'}/api/v1/admin/export/${type}?format=${format}`, {
+        const response = await fetch(`${("TURBOPACK compile-time value", "http://127.0.0.1:8000") || 'http://127.0.0.1:8000'}/api/v1/admin/reports/export/${type}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`
@@ -1155,7 +1137,8 @@ function ReportGenerator({ token }) {
             setReportData(data);
             __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].success('Report generated successfully');
         } catch (err) {
-            setError(err.message || 'Failed to generate report');
+            const msg = typeof err.message === 'string' ? err.message : JSON.stringify(err);
+            setError(msg);
             __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].error('Failed to generate report');
         } finally{
             setLoading(false);
@@ -1184,7 +1167,7 @@ function ReportGenerator({ token }) {
                     className: "h-5 w-5"
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 95,
+                    lineNumber: 96,
                     columnNumber: 16
                 }, this);
             case 'revenue':
@@ -1192,7 +1175,7 @@ function ReportGenerator({ token }) {
                     className: "h-5 w-5"
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 97,
+                    lineNumber: 98,
                     columnNumber: 16
                 }, this);
             case 'users':
@@ -1200,7 +1183,7 @@ function ReportGenerator({ token }) {
                     className: "h-5 w-5"
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 99,
+                    lineNumber: 100,
                     columnNumber: 16
                 }, this);
             case 'payments':
@@ -1208,7 +1191,7 @@ function ReportGenerator({ token }) {
                     className: "h-5 w-5"
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 101,
+                    lineNumber: 102,
                     columnNumber: 16
                 }, this);
             case 'transport':
@@ -1216,7 +1199,7 @@ function ReportGenerator({ token }) {
                     className: "h-5 w-5"
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 103,
+                    lineNumber: 104,
                     columnNumber: 16
                 }, this);
         }
@@ -1234,7 +1217,7 @@ function ReportGenerator({ token }) {
                             children: "Report Results"
                         }, void 0, false, {
                             fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                            lineNumber: 113,
+                            lineNumber: 114,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1246,20 +1229,20 @@ function ReportGenerator({ token }) {
                                     className: "h-4 w-4 mr-2"
                                 }, void 0, false, {
                                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                    lineNumber: 115,
+                                    lineNumber: 116,
                                     columnNumber: 13
                                 }, this),
                                 "Export CSV"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                            lineNumber: 114,
+                            lineNumber: 115,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 112,
+                    lineNumber: 113,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1275,7 +1258,7 @@ function ReportGenerator({ token }) {
                                         children: key.replace(/_/g, ' ')
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 127,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1283,30 +1266,30 @@ function ReportGenerator({ token }) {
                                         children: typeof value === 'number' ? value.toLocaleString() : value
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 129,
+                                        lineNumber: 130,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                lineNumber: 125,
+                                lineNumber: 126,
                                 columnNumber: 17
                             }, this)
                         }, key, false, {
                             fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                            lineNumber: 124,
+                            lineNumber: 125,
                             columnNumber: 15
                         }, this);
                     })
                 }, void 0, false, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 120,
+                    lineNumber: 121,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-            lineNumber: 111,
+            lineNumber: 112,
             columnNumber: 7
         }, this);
     };
@@ -1320,19 +1303,19 @@ function ReportGenerator({ token }) {
                             className: "h-5 w-5"
                         }, void 0, false, {
                             fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                            lineNumber: 145,
+                            lineNumber: 146,
                             columnNumber: 11
                         }, this),
                         "Report Generator"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                    lineNumber: 144,
+                    lineNumber: 145,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                lineNumber: 143,
+                lineNumber: 144,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1344,12 +1327,12 @@ function ReportGenerator({ token }) {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                            lineNumber: 152,
+                            lineNumber: 153,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                        lineNumber: 151,
+                        lineNumber: 152,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1363,7 +1346,7 @@ function ReportGenerator({ token }) {
                                         children: "Report Type"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 158,
+                                        lineNumber: 159,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
@@ -1374,12 +1357,12 @@ function ReportGenerator({ token }) {
                                                 id: "report_type",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectValue"], {}, void 0, false, {
                                                     fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                    lineNumber: 161,
+                                                    lineNumber: 162,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                lineNumber: 160,
+                                                lineNumber: 161,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1389,7 +1372,7 @@ function ReportGenerator({ token }) {
                                                         children: "Orders Report"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                        lineNumber: 164,
+                                                        lineNumber: 165,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1397,7 +1380,7 @@ function ReportGenerator({ token }) {
                                                         children: "Revenue Report"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                        lineNumber: 165,
+                                                        lineNumber: 166,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1405,7 +1388,7 @@ function ReportGenerator({ token }) {
                                                         children: "Users Report"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                        lineNumber: 166,
+                                                        lineNumber: 167,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1413,7 +1396,7 @@ function ReportGenerator({ token }) {
                                                         children: "Payments Report"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                        lineNumber: 167,
+                                                        lineNumber: 168,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1421,25 +1404,25 @@ function ReportGenerator({ token }) {
                                                         children: "Transport Report"
                                                     }, void 0, false, {
                                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                        lineNumber: 168,
+                                                        lineNumber: 169,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                                lineNumber: 163,
+                                                lineNumber: 164,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 159,
+                                        lineNumber: 160,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                lineNumber: 157,
+                                lineNumber: 158,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1450,7 +1433,7 @@ function ReportGenerator({ token }) {
                                         children: "Start Date (Optional)"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 174,
+                                        lineNumber: 175,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1460,13 +1443,13 @@ function ReportGenerator({ token }) {
                                         onChange: (e)=>setStartDate(e.target.value)
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 175,
+                                        lineNumber: 176,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                lineNumber: 173,
+                                lineNumber: 174,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1477,7 +1460,7 @@ function ReportGenerator({ token }) {
                                         children: "End Date (Optional)"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 184,
+                                        lineNumber: 185,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1487,19 +1470,19 @@ function ReportGenerator({ token }) {
                                         onChange: (e)=>setEndDate(e.target.value)
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                        lineNumber: 185,
+                                        lineNumber: 186,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                lineNumber: 183,
+                                lineNumber: 184,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                        lineNumber: 156,
+                        lineNumber: 157,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1513,26 +1496,26 @@ function ReportGenerator({ token }) {
                                 children: loading ? 'Generating...' : 'Generate Report'
                             }, void 0, false, {
                                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                                lineNumber: 196,
+                                lineNumber: 197,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                        lineNumber: 194,
+                        lineNumber: 195,
                         columnNumber: 9
                     }, this),
                     renderReportData()
                 ]
             }, void 0, true, {
                 fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-                lineNumber: 149,
+                lineNumber: 150,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/agrogebeya/frontend/components/admin/ReportGenerator.tsx",
-        lineNumber: 142,
+        lineNumber: 143,
         columnNumber: 5
     }, this);
 }

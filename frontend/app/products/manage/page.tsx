@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Plus, Search, Edit2, Trash2, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { productService } from '@/lib/product-service'
 import { Product } from '@/lib/types'
@@ -12,12 +13,17 @@ import { LoadingSkeleton } from '@/components/common/LoadingSkeleton'
 import { EmptyState } from '@/components/common/EmptyState'
 
 export default function ProductManagementPage() {
-  const { token } = useAuth()
+  const { user, token } = useAuth()
+  const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState('all')
+
+  useEffect(() => {
+    if (user && user.role !== 'farmer') { router.replace('/dashboard'); return }
+  }, [user, router])
   const [sortBy, setSortBy] = useState('name')
 
   const loadProducts = useCallback(async () => {

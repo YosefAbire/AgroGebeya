@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 export default function EditProductPage() {
   const params = useParams()
   const router = useRouter()
-  const { token } = useAuth()
+  const { user, token } = useAuth()
   const productId = Number(params.id)
 
   const [loading, setLoading] = useState(true)
@@ -31,6 +31,7 @@ export default function EditProductPage() {
   })
 
   const loadProduct = useCallback(async () => {
+    if (user && user.role !== 'farmer') { router.replace('/dashboard'); return }
     try {
       setLoading(true)
       const product = await productService.getProduct(productId, token || undefined)

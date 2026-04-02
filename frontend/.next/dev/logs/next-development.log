@@ -1,229 +1,251 @@
-[00:00:01.658] Server  LOG      ✓ Ready in 1227ms
-[00:00:05.285] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:05.435] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:05.435] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:05.435] Browser LOG     %c[Vercel Web Analytics]%c [view] http://192.168.56.1:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://192.168.56.1:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151009472} /_vercel/insights/view
-[00:00:13.558] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:14.616] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:14.616] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:14.617] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151017778} /_vercel/insights/view
-[00:00:48.206] Server  LOG      ✓ Compiled in 334ms
-[00:00:48.311] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+[00:00:01.572] Server  LOG      ✓ Ready in 1160ms
+[00:00:08.645] Server  LOG      ○ Compiling / ...
+[00:00:12.740] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:13.698] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:13.698] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:13.698] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775152999988} /_vercel/insights/view
+[00:00:25.966] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:26.223] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:26.223] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:26.223] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153012996} /_vercel/insights/view
+[00:00:43.195] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/logout color: rgb(120, 120, 120) color: inherit {"dp":"/auth/logout","o":"http://localhost:3000/auth/logout","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153029974} /_vercel/insights/view
+[00:00:45.326] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153032101} /_vercel/insights/view
+[00:00:49.458] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/login color: rgb(120, 120, 120) color: inherit {"dp":"/auth/login","o":"http://localhost:3000/auth/login","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153036236} /_vercel/insights/view
+[00:00:55.337] Server  ERROR    ⨯ ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+Expression expected
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:48.425] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+[00:00:55.471] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+Expression expected
+[00:00:56.605] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
+Expression expected
+[00:00:56.770] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:49.832] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+Expression expected
+[00:00:57.734] Server  ERROR    ⨯ ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+Expression expected
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:50.437] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+[00:00:57.810] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+Expression expected
+[00:00:58.188] Browser ERROR   uncaughtError: Error: ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
+Expression expected
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:01:09.039] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+[00:00:58.409] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
+Expression expected
+[00:00:58.409] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:01:09.430] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+Expression expected
+[00:01:07.032] Browser ERROR   uncaughtError: Error: ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+Expression expected
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:01:36.174] Server  LOG      ✓ Compiled in 98ms
-[00:01:36.291] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+[00:01:07.171] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
+Expression expected
+[00:01:07.171] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
+Expression expected
+[00:01:10.989] Browser ERROR   uncaughtError: Error: ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:01:36.442] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+Expression expected
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
 
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
+[00:01:11.153] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:01:48.542] Server  LOG      ✓ Compiled in 428ms
-[00:01:48.651] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
+Expression expected
+[00:01:11.153] Browser ERROR   ./agrogebeya/frontend/app/dashboard/farmer/page.tsx:28:4
+Parsing ecmascript source code failed
+  26 |       loadDashboardData()
+  27 |     }
+> 28 |   }, [token])
+     |    ^
+  29 |
+  30 |   const loadDashboardData = async () => {
+  31 |     if (!token) return
 
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
-
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
-
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:01:49.432] Browser ERROR   ./agrogebeya/frontend/proxy.ts
-Proxy is missing expected function export name
-This function is what Next.js runs for every request handled by this proxy (previously called middleware).
-
-Why this happens:
-- You are migrating from `middleware` to `proxy`, but haven't updated the exported function.
-- The file exists but doesn't export a function.
-- The export is not a function (e.g., an object or constant).
-- There's a syntax error preventing the export from being recognized.
-
-To fix it:
-- Ensure this file has either a default or "proxy" function export.
-
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:02:57.005] Server  LOG      ✓ Compiled in 148ms
-[00:02:59.145] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:59.394] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:59.509] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:02:59.509] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:02:59.509] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151183549} /_vercel/insights/view
-[00:03:27.788] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:03:28.238] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:03:28.238] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:03:28.238] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151212166} /_vercel/insights/view
-[00:03:39.875] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:03:40.302] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:03:40.303] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:03:40.303] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151224247} /_vercel/insights/view
-[00:03:44.222] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:03:44.705] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:03:44.705] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:03:44.705] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151228619} /_vercel/insights/view
-[00:03:48.731] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151232773} /_vercel/insights/view
-[00:03:51.100] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/admin/dashboard","o":"http://localhost:3000/admin/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151235139} /_vercel/insights/view
-[00:04:09.907] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:10.383] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:10.383] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/admin/dashboard","route":"/admin/dashboard"}
-[00:04:10.383] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/admin/dashboard","o":"http://localhost:3000/admin/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151254316} /_vercel/insights/view
-[00:04:16.159] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/orders color: rgb(120, 120, 120) color: inherit {"dp":"/orders","o":"http://localhost:3000/orders","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151260205} /_vercel/insights/view
-[00:04:22.714] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products color: rgb(120, 120, 120) color: inherit {"dp":"/products","o":"http://localhost:3000/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151266760} /_vercel/insights/view
-[00:04:36.089] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:36.604] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:36.604] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/products","route":"/products"}
-[00:04:36.604] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products color: rgb(120, 120, 120) color: inherit {"dp":"/products","o":"http://localhost:3000/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151280604} /_vercel/insights/view
-[00:04:47.792] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151291835} /_vercel/insights/view
-[00:04:51.990] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:52.569] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:52.569] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:04:52.569] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151296480} /_vercel/insights/view
-[00:04:54.879] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:55.493] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:55.493] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:04:55.493] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151299383} /_vercel/insights/view
-[00:05:08.659] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151312666} /_vercel/insights/view
-[00:05:09.193] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/admin/dashboard","o":"http://localhost:3000/admin/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151313218} /_vercel/insights/view
-[00:08:20.034] Browser ERROR   Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead.
-[00:08:49.430] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:08:50.074] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:08:50.074] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/admin/dashboard","route":"/admin/dashboard"}
-[00:08:50.074] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/admin/dashboard","o":"http://localhost:3000/admin/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151534022} /_vercel/insights/view
-[00:12:22.781] Server  LOG      ✓ Compiled in 274.7s
-[00:14:01.911] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:14:02.209] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:14:02.209] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/admin/products","route":"/admin/products"}
-[00:14:02.209] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/products color: rgb(120, 120, 120) color: inherit {"dp":"/admin/products","o":"http://localhost:3000/admin/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151846155} /_vercel/insights/view
-[00:14:15.322] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:14:15.562] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:14:15.562] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/admin/products","route":"/admin/products"}
-[00:14:15.562] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/products color: rgb(120, 120, 120) color: inherit {"dp":"/admin/products","o":"http://localhost:3000/admin/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151859565} /_vercel/insights/view
-[00:14:23.110] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:14:23.497] Browser ERROR   Error loading products: {}
-[00:14:23.601] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:14:23.601] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/products","route":"/products"}
-[00:14:23.601] Browser LOG     %c[Vercel Web Analytics]%c [view] http://192.168.56.1:3000/products color: rgb(120, 120, 120) color: inherit {"dp":"/products","o":"http://192.168.56.1:3000/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151867647} /_vercel/insights/view
-[00:14:27.814] Browser LOG     %c[Vercel Web Analytics]%c [view] http://192.168.56.1:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://192.168.56.1:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151871854} /_vercel/insights/view
-[00:14:28.730] Browser LOG     %c[Vercel Web Analytics]%c [view] http://192.168.56.1:3000/auth/login color: rgb(120, 120, 120) color: inherit {"dp":"/auth/login","o":"http://192.168.56.1:3000/auth/login","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151872763} /_vercel/insights/view
-[00:16:04.192] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./agrogebeya/frontend/lib/api.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:16:06.142] Server  LOG      ✓ Compiled in 102.9s
-[00:16:06.367] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:16:06.740] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:16:06.740] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth/login","route":"/auth/login"}
-[00:16:06.741] Browser LOG     %c[Vercel Web Analytics]%c [view] http://192.168.56.1:3000/auth/login color: rgb(120, 120, 120) color: inherit {"dp":"/auth/login","o":"http://192.168.56.1:3000/auth/login","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775151970717} /_vercel/insights/view
-[00:18:27.033] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:18:27.402] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:18:27.402] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:18:27.402] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775152111444} /_vercel/insights/view
-[00:18:31.584] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:18:31.863] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:18:31.863] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:18:31.863] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775152115874} /_vercel/insights/view
-[00:18:41.902] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products color: rgb(120, 120, 120) color: inherit {"dp":"/products","o":"http://localhost:3000/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775152125944} /_vercel/insights/view
+Expression expected
+[00:01:39.765] Server  LOG      ✓ Compiled in 394ms
+[00:01:40.237] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:40.611] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:40.611] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:01:40.611] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153087343} /_vercel/insights/view
+[00:01:59.564] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products/analytics color: rgb(120, 120, 120) color: inherit {"dp":"/products/analytics","o":"http://localhost:3000/products/analytics","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153106337} /_vercel/insights/view
+[00:02:20.659] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153127430} /_vercel/insights/view
+[00:02:21.243] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/farmer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/farmer","o":"http://localhost:3000/dashboard/farmer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153127998} /_vercel/insights/view
+[00:02:27.636] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products/manage color: rgb(120, 120, 120) color: inherit {"dp":"/products/manage","o":"http://localhost:3000/products/manage","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153134409} /_vercel/insights/view
+[00:02:35.773] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/farmer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/farmer","o":"http://localhost:3000/dashboard/farmer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153142556} /_vercel/insights/view
+[00:02:39.666] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products/new color: rgb(120, 120, 120) color: inherit {"dp":"/products/new","o":"http://localhost:3000/products/new","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153146435} /_vercel/insights/view
+[00:02:45.485] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/farmer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/farmer","o":"http://localhost:3000/dashboard/farmer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153152246} /_vercel/insights/view
+[00:02:52.094] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/inventory color: rgb(120, 120, 120) color: inherit {"dp":"/inventory","o":"http://localhost:3000/inventory","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153158873} /_vercel/insights/view
+[00:03:01.514] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/farmer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/farmer","o":"http://localhost:3000/dashboard/farmer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153168273} /_vercel/insights/view
+[00:03:10.485] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:03:10.847] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:03:10.847] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/farmer","route":"/dashboard/farmer"}
+[00:03:10.847] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/farmer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/farmer","o":"http://localhost:3000/dashboard/farmer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153177630} /_vercel/insights/view
+[00:03:16.190] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/logout color: rgb(120, 120, 120) color: inherit {"dp":"/auth/logout","o":"http://localhost:3000/auth/logout","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153182971} /_vercel/insights/view
+[00:03:18.396] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153185170} /_vercel/insights/view
+[00:03:21.970] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/login color: rgb(120, 120, 120) color: inherit {"dp":"/auth/login","o":"http://localhost:3000/auth/login","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153188739} /_vercel/insights/view
+[00:03:26.708] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/retailer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/retailer","o":"http://localhost:3000/dashboard/retailer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153193463} /_vercel/insights/view
+[00:03:34.147] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products color: rgb(120, 120, 120) color: inherit {"dp":"/products","o":"http://localhost:3000/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153200921} /_vercel/insights/view
+[00:03:41.516] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/orders color: rgb(120, 120, 120) color: inherit {"dp":"/orders","o":"http://localhost:3000/orders","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153208288} /_vercel/insights/view
+[00:03:45.448] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153212229} /_vercel/insights/view
+[00:03:53.646] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/orders color: rgb(120, 120, 120) color: inherit {"dp":"/orders","o":"http://localhost:3000/orders","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153220422} /_vercel/insights/view
+[00:03:56.995] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153223771} /_vercel/insights/view
+[00:04:00.771] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/orders color: rgb(120, 120, 120) color: inherit {"dp":"/orders","o":"http://localhost:3000/orders","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153227554} /_vercel/insights/view
+[00:04:03.149] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153229929} /_vercel/insights/view
+[00:04:05.898] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/orders color: rgb(120, 120, 120) color: inherit {"dp":"/orders","o":"http://localhost:3000/orders","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153232680} /_vercel/insights/view
+[00:04:09.060] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/transport color: rgb(120, 120, 120) color: inherit {"dp":"/transport","o":"http://localhost:3000/transport","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153235822} /_vercel/insights/view
+[00:04:22.113] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/dashboard/retailer color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/retailer","o":"http://localhost:3000/dashboard/retailer","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153248872} /_vercel/insights/view
+[00:04:26.274] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/products color: rgb(120, 120, 120) color: inherit {"dp":"/products","o":"http://localhost:3000/products","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153252998} /_vercel/insights/view
+[00:04:32.371] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/logout color: rgb(120, 120, 120) color: inherit {"dp":"/auth/logout","o":"http://localhost:3000/auth/logout","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153259146} /_vercel/insights/view
+[00:04:34.507] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153261286} /_vercel/insights/view
+[00:04:38.102] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/register color: rgb(120, 120, 120) color: inherit {"dp":"/auth/register","o":"http://localhost:3000/auth/register","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153264866} /_vercel/insights/view
+[00:04:43.801] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153270573} /_vercel/insights/view
+[00:04:47.000] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/register color: rgb(120, 120, 120) color: inherit {"dp":"/auth/register","o":"http://localhost:3000/auth/register","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153273767} /_vercel/insights/view
+[00:04:53.516] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153280299} /_vercel/insights/view
+[00:04:57.666] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/auth/login color: rgb(120, 120, 120) color: inherit {"dp":"/auth/login","o":"http://localhost:3000/auth/login","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153284442} /_vercel/insights/view
+[00:05:01.847] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin color: rgb(120, 120, 120) color: inherit {"dp":"/admin","o":"http://localhost:3000/admin","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153288630} /_vercel/insights/view
+[00:05:07.558] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/users color: rgb(120, 120, 120) color: inherit {"dp":"/admin/users","o":"http://localhost:3000/admin/users","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153294337} /_vercel/insights/view
+[00:05:24.459] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin color: rgb(120, 120, 120) color: inherit {"dp":"/admin","o":"http://localhost:3000/admin","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153311238} /_vercel/insights/view
+[00:05:30.373] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/verification color: rgb(120, 120, 120) color: inherit {"dp":"/admin/verification","o":"http://localhost:3000/admin/verification","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153317144} /_vercel/insights/view
+[00:05:38.904] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/reports color: rgb(120, 120, 120) color: inherit {"dp":"/admin/reports","o":"http://localhost:3000/admin/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153325648} /_vercel/insights/view
+[00:05:42.265] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/users color: rgb(120, 120, 120) color: inherit {"dp":"/admin/users","o":"http://localhost:3000/admin/users","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153329044} /_vercel/insights/view
+[00:05:43.507] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin color: rgb(120, 120, 120) color: inherit {"dp":"/admin","o":"http://localhost:3000/admin","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153330290} /_vercel/insights/view
+[00:05:45.287] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/reports color: rgb(120, 120, 120) color: inherit {"dp":"/admin/reports","o":"http://localhost:3000/admin/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153332037} /_vercel/insights/view
+[00:05:46.955] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/transport color: rgb(120, 120, 120) color: inherit {"dp":"/admin/transport","o":"http://localhost:3000/admin/transport","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153333726} /_vercel/insights/view
+[00:06:25.277] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/config color: rgb(120, 120, 120) color: inherit {"dp":"/admin/config","o":"http://localhost:3000/admin/config","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153372057} /_vercel/insights/view
+[00:06:27.112] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/audit color: rgb(120, 120, 120) color: inherit {"dp":"/admin/audit","o":"http://localhost:3000/admin/audit","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153373892} /_vercel/insights/view
+[00:06:37.893] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/feedback color: rgb(120, 120, 120) color: inherit {"dp":"/admin/feedback","o":"http://localhost:3000/admin/feedback","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153384670} /_vercel/insights/view
+[00:06:59.985] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/transport color: rgb(120, 120, 120) color: inherit {"dp":"/admin/transport","o":"http://localhost:3000/admin/transport","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153406747} /_vercel/insights/view
+[00:07:03.018] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin color: rgb(120, 120, 120) color: inherit {"dp":"/admin","o":"http://localhost:3000/admin","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153409799} /_vercel/insights/view
+[00:07:25.374] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/users color: rgb(120, 120, 120) color: inherit {"dp":"/admin/users","o":"http://localhost:3000/admin/users","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153432147} /_vercel/insights/view
+[00:09:06.103] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/verification color: rgb(120, 120, 120) color: inherit {"dp":"/admin/verification","o":"http://localhost:3000/admin/verification","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153532880} /_vercel/insights/view
+[00:09:10.019] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/reports color: rgb(120, 120, 120) color: inherit {"dp":"/admin/reports","o":"http://localhost:3000/admin/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153536772} /_vercel/insights/view
+[00:11:23.001] Server  LOG      ✓ Compiled in 1096ms
+[00:11:36.814] Server  LOG      ✓ Compiled in 360ms
+[00:13:10.885] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/backups color: rgb(120, 120, 120) color: inherit {"dp":"/admin/backups","o":"http://localhost:3000/admin/backups","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153777664} /_vercel/insights/view
+[00:13:24.226] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/config color: rgb(120, 120, 120) color: inherit {"dp":"/admin/config","o":"http://localhost:3000/admin/config","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153790999} /_vercel/insights/view
+[00:13:26.357] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/audit color: rgb(120, 120, 120) color: inherit {"dp":"/admin/audit","o":"http://localhost:3000/admin/audit","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153793134} /_vercel/insights/view
+[00:13:33.070] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/admin/feedback color: rgb(120, 120, 120) color: inherit {"dp":"/admin/feedback","o":"http://localhost:3000/admin/feedback","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1775153799848} /_vercel/insights/view

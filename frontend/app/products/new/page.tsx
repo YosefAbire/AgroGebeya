@@ -31,17 +31,11 @@ export default function NewProductPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Check auth but don't redirect immediately - show message instead
+  // Redirect non-farmers immediately
   useEffect(() => {
-    // Don't check while still loading auth state
-    if (loading) return
-    
-    if (!user) {
-      setError('Please login to create products')
-    } else if (user.role !== 'farmer') {
-      setError('Only farmers can create products')
-    }
-  }, [user, loading])
+    if (!user) return // wait for auth to load
+    if (user.role !== 'farmer') router.replace('/dashboard')
+  }, [user, router])
 
   // Show loading state while checking auth
   if (loading) {

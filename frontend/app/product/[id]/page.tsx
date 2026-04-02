@@ -286,7 +286,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               )}
             </div>
 
-            {/* Order Form */}
+            {/* Order Form — retailers only */}
+            {user?.role === 'retailer' ? (
             <div className="rounded-lg border border-border bg-card p-6">
               <h3 className="text-lg font-semibold text-foreground mb-6">Place Your Order</h3>
 
@@ -370,6 +371,16 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </p>
               </div>
             </div>
+            ) : user?.role === 'farmer' ? (
+              <div className="rounded-lg border border-border bg-card p-6 text-center text-muted-foreground">
+                <ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">Farmers cannot place orders. Switch to a retailer account to buy products.</p>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-border bg-card p-6 text-center text-muted-foreground">
+                <p className="text-sm"><a href="/auth/login" className="text-primary hover:underline">Log in</a> as a retailer to place an order.</p>
+              </div>
+            )}
           </div>
         </div>
 
