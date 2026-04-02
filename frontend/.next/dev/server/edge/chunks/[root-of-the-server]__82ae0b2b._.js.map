@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/agrogebeya/frontend/middleware.ts"],"sourcesContent":["import createMiddleware from 'next-intl/middleware';\r\n\r\nexport default createMiddleware({\r\n  locales: ['en', 'am'],\r\n  defaultLocale: 'en',\r\n  localePrefix: 'as-needed', // English URLs stay clean (/products), Amharic gets /am/products\r\n});\r\n\r\nexport const config = {\r\n  matcher: ['/((?!api|_next|_vercel|.*\\\\..*).*)'],\r\n};\r\n"],"names":[],"mappings":";;;;;;AAAA;;uCAEe,IAAA,mOAAgB,EAAC;IAC9B,SAAS;QAAC;QAAM;KAAK;IACrB,eAAe;IACf,cAAc;AAChB;AAEO,MAAM,SAAS;IACpB,SAAS;QAAC;KAAqC;AACjD"}}]
+}

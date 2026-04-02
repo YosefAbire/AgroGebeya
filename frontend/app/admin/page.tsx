@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
     n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
   const fmtCurrency = (n: number) =>
-    new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB', maximumFractionDigits: 0 }).format(n);
+    `${new Intl.NumberFormat('en-ET', { maximumFractionDigits: 0 }).format(n)} ETB`;
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-8">

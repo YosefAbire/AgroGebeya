@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { NotificationBell } from './notifications/NotificationBell'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 interface UserData {
   id: string
@@ -71,7 +72,8 @@ export default function Header() {
           </nav>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             {user && token ? (
               <>
                 {/* Notifications - Only for logged in users */}

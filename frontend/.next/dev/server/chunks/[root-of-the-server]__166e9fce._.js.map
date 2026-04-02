@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 40, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/hp/agrogebeya/frontend/proxy.ts"],"sourcesContent":["// next-intl is configured in \"no routing\" mode.\r\n// Locale is stored in a cookie and read client-side.\r\n// No URL-based locale routing — all pages stay at their existing paths.\r\nexport {};\r\n"],"names":[],"mappings":"AAAA,gDAAgD;AAChD,qDAAqD;AACrD,wEAAwE"}}]
+}

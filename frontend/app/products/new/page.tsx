@@ -249,7 +249,7 @@ export default function NewProductPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-foreground mb-1">
-                  Price (ETB) <span className="text-red-500">*</span>
+                  Price (Birr) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"

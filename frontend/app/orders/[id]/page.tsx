@@ -152,7 +152,7 @@ export default function OrderDetailPage() {
                 <Badge variant="outline">{(order as any).payment_status || 'unpaid'}</Badge>
               </div>
               <div><p className="text-muted-foreground">Quantity</p><p className="font-medium">{order.quantity} units</p></div>
-              <div><p className="text-muted-foreground">Total Price</p><p className="font-medium">ETB {order.total_price.toLocaleString()}</p></div>
+              <div><p className="text-muted-foreground">Total Price</p><p className="font-medium">{order.total_price.toLocaleString()} ETB</p></div>
               {order.delivery_date && (
                 <div><p className="text-muted-foreground">Delivery Date</p>
                   <p className="font-medium">{new Date(order.delivery_date).toLocaleDateString()}</p>

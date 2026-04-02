@@ -173,6 +173,23 @@ function useAuth() {
     }["useAuth.useCallback[register]"], [
         login
     ]);
+    const refreshUser = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "useAuth.useCallback[refreshUser]": async ()=>{
+            const storedToken = localStorage.getItem('authToken');
+            if (!storedToken) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+                    headers: {
+                        Authorization: `Bearer ${storedToken}`
+                    }
+                });
+                if (!res.ok) return;
+                const userData = await res.json();
+                localStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+            } catch  {}
+        }
+    }["useAuth.useCallback[refreshUser]"], []);
     const updateProfile = (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "useAuth.useCallback[updateProfile]": async (updates)=>{
             setIsLoading(true);
@@ -205,10 +222,11 @@ function useAuth() {
         login,
         logout,
         register,
-        updateProfile
+        updateProfile,
+        refreshUser
     };
 }
-_s(useAuth, "gbpnY1EIoj5MWktKXC2atH5rIL0=");
+_s(useAuth, "GepUweAA7QwP2zOOYCN7ZODm9pI=");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -887,6 +905,8 @@ function AuditLogViewer({ token }) {
                         className: "flex gap-2 mb-4",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
+                                id: "auditActionFilter",
+                                name: "auditActionFilter",
                                 placeholder: "Filter by action...",
                                 value: actionType,
                                 onChange: (e)=>setActionType(e.target.value),

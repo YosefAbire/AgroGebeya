@@ -85,7 +85,7 @@ export function TransactionList({ token }: TransactionListProps) {
               </div>
               <div className="text-right">
                 <p className="font-semibold">
-                  {transaction.amount} {transaction.currency}
+                  {transaction.amount} ETB
                 </p>
                 {transaction.chapa_transaction_ref && (
                   <p className="text-xs text-muted-foreground">

@@ -24,7 +24,7 @@ export default function AdminAnalyticsPage() {
 
   const orderMetrics = [
     { metric: 'Total Orders', value: '2,171', growth: '+34%' },
-    { metric: 'Avg Order Value', value: '৳18,500', growth: '+8%' },
+    { metric: 'Avg Order Value', value: '18,500 ETB', growth: '+8%' },
     { metric: 'Completed Orders', value: '1,847', growth: '+41%' },
     { metric: 'Pending Orders', value: '324', growth: '+5%' },
   ]
@@ -100,7 +100,7 @@ export default function AdminAnalyticsPage() {
                     <p className="text-sm font-medium text-foreground">{item.month}</p>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-muted-foreground">{item.orders} orders</span>
-                      <span className="text-sm font-medium text-foreground">৳{(item.revenue / 100000).toFixed(1)}L</span>
+                      <span className="text-sm font-medium text-foreground">{(item.revenue / 100000).toFixed(1)}L ETB</span>
                     </div>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">

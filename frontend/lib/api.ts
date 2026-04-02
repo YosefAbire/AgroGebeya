@@ -55,6 +55,11 @@ async function apiRequest<T>(
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...fetchOptions,
     headers,
+  }).catch((err) => {
+    // Network-level failure — backend not running or unreachable
+    throw new Error(
+      `Cannot reach the server at ${API_BASE_URL}. Make sure the backend is running.\n(${err.message})`
+    );
   });
 
   if (!response.ok) {

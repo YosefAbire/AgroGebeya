@@ -135,7 +135,7 @@ export default function InventoryAnalyticsPage() {
               <CardContent className="pt-6">
                 <p className="text-sm font-medium text-muted-foreground mb-2">Inventory Value</p>
                 <p className="text-3xl font-bold text-foreground">
-                  {stats ? `৳${(stats.total_value > 0 ? stats.total_value : 245000).toLocaleString()}` : '--'}
+                  {stats ? `${(stats.total_value > 0 ? stats.total_value : 245000).toLocaleString()} ETB` : '--'}
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">estimated</p>
               </CardContent>

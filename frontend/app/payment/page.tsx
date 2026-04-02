@@ -100,7 +100,7 @@ export default function PaymentPage() {
                           <option value="">Choose an order...</option>
                           {orders.map(o => (
                             <option key={o.id} value={o.id}>
-                              Order #{o.id} — ETB {o.total_price.toLocaleString()}
+                              Order #{o.id} — {o.total_price.toLocaleString()} ETB
                             </option>
                           ))}
                         </select>
@@ -110,7 +110,7 @@ export default function PaymentPage() {
                     {selectedOrder && (
                       <div className="p-4 bg-secondary/50 rounded-lg">
                         <p className="text-sm text-muted-foreground">Amount Due</p>
-                        <p className="text-2xl font-bold text-primary">ETB {selectedOrder.total_price.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-primary">{selectedOrder.total_price.toLocaleString()} ETB</p>
                       </div>
                     )}
 
@@ -160,7 +160,7 @@ export default function PaymentPage() {
                             {o.status}
                           </span>
                         </div>
-                        <p className="text-sm font-bold">ETB {o.total_price.toLocaleString()}</p>
+                        <p className="text-sm font-bold">{o.total_price.toLocaleString()} ETB</p>
                         <p className="text-xs text-muted-foreground mt-1">{new Date(o.created_at).toLocaleDateString()}</p>
                       </div>
                     ))

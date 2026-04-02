@@ -5,6 +5,8 @@ import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/components/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
 import { Providers } from './providers'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -33,20 +35,24 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const messages = await getMessages()
+
   return (
     <html lang="en">
       <body className={`font-sans antialiased`}>
-        <Providers>
-          <AuthProvider>
-            {children}
-            <Toaster position="top-right" richColors />
-          </AuthProvider>
-        </Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            <AuthProvider>
+              {children}
+              <Toaster position="top-right" richColors />
+            </AuthProvider>
+          </Providers>
+        </NextIntlClientProvider>
         <Analytics />
       </body>
     </html>

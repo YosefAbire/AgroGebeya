@@ -42,7 +42,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Revenue',
-      value: '৳2.8M',
+      value: '2.8M ETB',
       change: '+18% growth',
       icon: <DollarSign className="h-6 w-6" />,
       color: 'text-yellow-600',
@@ -57,18 +57,18 @@ export default function AdminDashboardPage() {
   ]
 
   const recentOrders = [
-    { id: 'ORD-001847', user: 'Addis Ababa Agro', amount: '৳45,250', status: 'Delivered', date: 'Jan 20' },
-    { id: 'ORD-001846', user: 'Dire Dawa Trading', amount: '৳32,500', status: 'In Transit', date: 'Jan 19' },
-    { id: 'ORD-001845', user: 'Hawassa Market', amount: '৳15,800', status: 'Pending', date: 'Jan 18' },
-    { id: 'ORD-001844', user: 'Mekelle Wholesale', amount: '৳58,900', status: 'Delivered', date: 'Jan 17' },
+    { id: 'ORD-001847', user: 'Addis Ababa Agro', amount: '45,250 ETB', status: 'Delivered', date: 'Jan 20' },
+    { id: 'ORD-001846', user: 'Dire Dawa Trading', amount: '32,500 ETB', status: 'In Transit', date: 'Jan 19' },
+    { id: 'ORD-001845', user: 'Hawassa Market', amount: '15,800 ETB', status: 'Pending', date: 'Jan 18' },
+    { id: 'ORD-001844', user: 'Mekelle Wholesale', amount: '58,900 ETB', status: 'Delivered', date: 'Jan 17' },
   ]
 
   const topProducts = [
-    { name: 'Teff Flour', sales: 487, revenue: '৳219,150' },
-    { name: 'Wheat', sales: 342, revenue: '৳232,560' },
-    { name: 'Maize', sales: 298, revenue: '৳113,240' },
-    { name: 'Barley', sales: 215, revenue: '৳111,800' },
-    { name: 'Fertilizer NPK', sales: 156, revenue: '৳187,200' },
+    { name: 'Teff Flour', sales: 487, revenue: '219,150 ETB' },
+    { name: 'Wheat', sales: 342, revenue: '232,560 ETB' },
+    { name: 'Maize', sales: 298, revenue: '113,240 ETB' },
+    { name: 'Barley', sales: 215, revenue: '111,800 ETB' },
+    { name: 'Fertilizer NPK', sales: 156, revenue: '187,200 ETB' },
   ]
 
   const getStatusColor = (status: string) => {

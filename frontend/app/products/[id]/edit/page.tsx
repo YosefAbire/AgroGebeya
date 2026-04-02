@@ -142,7 +142,7 @@ export default function EditProductPage() {
             <h2 className="text-lg font-semibold text-foreground">Pricing and Inventory</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="price" className="block text-sm font-medium text-foreground mb-1">Price (ETB)</label>
+                <label htmlFor="price" className="block text-sm font-medium text-foreground mb-1">Price (Birr)</label>
                 <Input id="price" name="price" type="number" min="0" value={formData.price} onChange={handleChange} disabled={isSaving} required />
               </div>
               <div>

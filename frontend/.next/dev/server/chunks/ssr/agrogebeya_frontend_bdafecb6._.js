@@ -1667,10 +1667,29 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/agrogebeya/frontend/lib/api.ts [app-ssr] (ecmascript)");
 ;
+const API_BASE_URL = ("TURBOPACK compile-time value", "http://127.0.0.1:8000") || 'http://127.0.0.1:8000';
 const verificationService = {
     // Submit National ID for verification
     submit: async (data, token)=>{
         return __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].post('/api/v1/verification/submit', data, token);
+    },
+    // Upload front and back ID photos
+    uploadIdImages: async (frontImage, backImage, token)=>{
+        const formData = new FormData();
+        formData.append('front_image', frontImage);
+        formData.append('back_image', backImage);
+        const response = await fetch(`${API_BASE_URL}/api/v1/verification/upload-id-images`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: formData
+        });
+        if (!response.ok) {
+            const err = await response.json().catch(()=>({}));
+            throw new Error(err.detail || 'Failed to upload ID images');
+        }
+        return response.json();
     },
     // Get user's verification status
     getStatus: async (token)=>{
@@ -2253,7 +2272,6 @@ function RetailerDashboard() {
             color: 'primary'
         }
     ];
-    // Transform API data to OrderList format
     const transformedOrders = recentPurchases.map((order)=>({
             id: order.id.toString(),
             orderNumber: order.order_number,
@@ -2270,7 +2288,7 @@ function RetailerDashboard() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$Header$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                lineNumber: 87,
+                lineNumber: 65,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -2280,7 +2298,7 @@ function RetailerDashboard() {
                         token: token
                     }, void 0, false, {
                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                        lineNumber: 91,
+                        lineNumber: 68,
                         columnNumber: 19
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2293,7 +2311,7 @@ function RetailerDashboard() {
                                         children: "Retailer Dashboard"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 96,
+                                        lineNumber: 72,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2305,37 +2323,37 @@ function RetailerDashboard() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 97,
+                                        lineNumber: 73,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 95,
+                                lineNumber: 71,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                href: "/market",
+                                href: "/products",
                                 className: "flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors whitespace-nowrap",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shopping$2d$cart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ShoppingCart$3e$__["ShoppingCart"], {
                                         className: "h-5 w-5"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 105,
+                                        lineNumber: 81,
                                         columnNumber: 13
                                     }, this),
                                     "Browse Market"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 101,
+                                lineNumber: 77,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                        lineNumber: 94,
+                        lineNumber: 70,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2347,12 +2365,12 @@ function RetailerDashboard() {
                                 color: stat.color
                             }, index, false, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 113,
+                                lineNumber: 88,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                        lineNumber: 111,
+                        lineNumber: 86,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2368,7 +2386,7 @@ function RetailerDashboard() {
                                                 children: "Recent Purchases"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                                lineNumber: 127,
+                                                lineNumber: 95,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2376,29 +2394,28 @@ function RetailerDashboard() {
                                                 children: "Your latest orders from farmers"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                                lineNumber: 128,
+                                                lineNumber: 96,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 94,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                        // TODO: Update link to actual path if there is a specific page for all purchases
                                         href: "/orders",
                                         className: "text-sm font-semibold text-primary hover:text-primary/90 transition-colors whitespace-nowrap",
                                         children: "View All Purchases →"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 130,
+                                        lineNumber: 98,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 125,
+                                lineNumber: 93,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2412,7 +2429,7 @@ function RetailerDashboard() {
                                                 className: "inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                                lineNumber: 143,
+                                                lineNumber: 107,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2420,25 +2437,25 @@ function RetailerDashboard() {
                                                 children: "Loading purchases..."
                                             }, void 0, false, {
                                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                                lineNumber: 144,
+                                                lineNumber: 108,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 142,
+                                        lineNumber: 106,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                    lineNumber: 141,
+                                    lineNumber: 105,
                                     columnNumber: 15
                                 }, this) : transformedOrders.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$components$2f$OrderList$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                     orders: transformedOrders,
                                     showFarmer: true
                                 }, void 0, false, {
                                     fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                    lineNumber: 148,
+                                    lineNumber: 112,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "rounded-lg border border-border bg-card p-12 text-center",
@@ -2447,7 +2464,7 @@ function RetailerDashboard() {
                                             className: "mx-auto h-12 w-12 text-muted-foreground"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 115,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2455,7 +2472,7 @@ function RetailerDashboard() {
                                             children: "No purchases yet"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 152,
+                                            lineNumber: 116,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2463,40 +2480,40 @@ function RetailerDashboard() {
                                             children: "Your purchases from farmers will appear here"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 153,
+                                            lineNumber: 117,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                            href: "/market",
+                                            href: "/products",
                                             className: "mt-4 inline-block text-sm font-semibold text-primary hover:text-primary/90 transition-colors",
                                             children: "Browse Market →"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 156,
+                                            lineNumber: 118,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                    lineNumber: 150,
+                                    lineNumber: 114,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 139,
+                                lineNumber: 103,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                        lineNumber: 124,
+                        lineNumber: 92,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-12 grid gap-4 sm:grid-cols-3",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                href: "/market",
+                                href: "/products",
                                 className: "flex flex-col items-start gap-3 rounded-lg border border-border bg-card p-6 hover:shadow-lg transition-shadow",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2505,12 +2522,12 @@ function RetailerDashboard() {
                                             className: "h-5 w-5"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 129,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 128,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2518,7 +2535,7 @@ function RetailerDashboard() {
                                         children: "Marketplace"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 176,
+                                        lineNumber: 131,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2526,13 +2543,13 @@ function RetailerDashboard() {
                                         children: "Browse and buy products from farmers"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 132,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 169,
+                                lineNumber: 127,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2545,12 +2562,12 @@ function RetailerDashboard() {
                                             className: "h-5 w-5"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 185,
+                                            lineNumber: 137,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 184,
+                                        lineNumber: 136,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2558,7 +2575,7 @@ function RetailerDashboard() {
                                         children: "Track Deliveries"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 187,
+                                        lineNumber: 139,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2566,13 +2583,13 @@ function RetailerDashboard() {
                                         children: "Monitor your incoming deliveries"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 188,
+                                        lineNumber: 140,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 180,
+                                lineNumber: 135,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2585,12 +2602,12 @@ function RetailerDashboard() {
                                             className: "h-5 w-5"
                                         }, void 0, false, {
                                             fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                            lineNumber: 196,
+                                            lineNumber: 145,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 195,
+                                        lineNumber: 144,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2598,7 +2615,7 @@ function RetailerDashboard() {
                                         children: "My Inventory"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 198,
+                                        lineNumber: 147,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$agrogebeya$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2606,31 +2623,31 @@ function RetailerDashboard() {
                                         children: "Manage your received products stock"
                                     }, void 0, false, {
                                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                        lineNumber: 199,
+                                        lineNumber: 148,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                                lineNumber: 191,
+                                lineNumber: 143,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                        lineNumber: 168,
+                        lineNumber: 126,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-                lineNumber: 89,
+                lineNumber: 67,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/agrogebeya/frontend/app/dashboard/retailer/page.tsx",
-        lineNumber: 86,
+        lineNumber: 64,
         columnNumber: 5
     }, this);
 }

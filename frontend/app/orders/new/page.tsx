@@ -215,7 +215,7 @@ export default function NewOrderPage() {
                             <option value="">Select a product</option>
                             {products.map(product => (
                               <option key={product.id} value={product.id}>
-                                {product.name} - {product.category} (ETB {product.price}/{product.unit})
+                              {product.name} - {product.category} ({product.price} ETB/{product.unit})
                               </option>
                             ))}
                           </select>
@@ -256,10 +256,10 @@ export default function NewOrderPage() {
                           <div key={item.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                             <div className="flex-1">
                               <p className="font-medium text-foreground">{item.productName}</p>
-                              <p className="text-sm text-muted-foreground">{item.quantity} units × ETB {item.unitPrice}</p>
+                              <p className="text-sm text-muted-foreground">{item.quantity} units × {item.unitPrice} ETB</p>
                             </div>
                             <div className="flex items-center gap-4">
-                              <p className="font-medium text-foreground">ETB {item.total.toLocaleString()}</p>
+                              <p className="font-medium text-foreground">{item.total.toLocaleString()} ETB</p>
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -319,15 +319,15 @@ export default function NewOrderPage() {
                       <p className="text-sm text-muted-foreground">Items: {items.length}</p>
                       <div className="py-2 border-t border-border">
                         <p className="text-sm font-medium text-foreground">Subtotal</p>
-                        <p className="text-lg font-bold text-foreground">ETB {subtotal.toLocaleString()}</p>
+                        <p className="text-lg font-bold text-foreground">{subtotal.toLocaleString()} ETB</p>
                       </div>
                       <div className="py-2">
                         <p className="text-sm font-medium text-foreground">Tax (15%)</p>
-                        <p className="text-lg font-bold text-foreground">ETB {tax.toLocaleString()}</p>
+                        <p className="text-lg font-bold text-foreground">{tax.toLocaleString()} ETB</p>
                       </div>
                       <div className="py-2 border-t border-border bg-muted rounded-lg p-3">
                         <p className="text-sm font-medium text-foreground">Total</p>
-                        <p className="text-2xl font-bold text-primary">ETB {total.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-primary">{total.toLocaleString()} ETB</p>
                       </div>
                     </div>
                   </>

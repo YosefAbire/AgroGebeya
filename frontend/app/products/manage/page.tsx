@@ -172,7 +172,7 @@ export default function ProductManagementPage() {
                     <tr key={product.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
                       <td className="px-6 py-4 font-medium text-foreground">{product.name}</td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">{product.category}</td>
-                      <td className="px-6 py-4 font-medium text-foreground">ETB {product.price.toLocaleString()}/{product.unit}</td>
+                      <td className="px-6 py-4 font-medium text-foreground">{product.price.toLocaleString()} ETB/{product.unit}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <span className={`font-medium ${

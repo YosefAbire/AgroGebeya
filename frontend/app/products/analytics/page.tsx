@@ -116,7 +116,7 @@ export default function ProductAnalyticsPage() {
                           <p className="text-sm text-muted-foreground">{p.category} • {p.location}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium text-foreground">ETB {p.price.toLocaleString()}/{p.unit}</p>
+                          <p className="font-medium text-foreground">{p.price.toLocaleString()} ETB/{p.unit}</p>
                           <p className={`text-sm ${p.available_quantity === 0 ? 'text-destructive' : p.available_quantity < 20 ? 'text-orange-600' : 'text-green-600'}`}>
                             {p.available_quantity} in stock
                           </p>

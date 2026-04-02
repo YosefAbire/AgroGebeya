@@ -137,7 +137,7 @@ export default function OrderHistoryPage() {
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Qty • Total</p>
                           <p className="text-foreground">
-                            {order.quantity} units • ETB {order.total_price.toLocaleString()}
+                            {order.quantity} units • {order.total_price.toLocaleString()} ETB
                           </p>
                         </div>
                         <div className="flex items-center justify-between">
