@@ -31,7 +31,7 @@ export function NotificationBell({ token }: NotificationBellProps) {
     onNotification: (notification) => {
       setNotifications((prev) => [notification, ...prev]);
       toast(notification.title, {
-        description: notification.message,
+        description: notification.content || notification.message,
       });
     },
     autoReconnect: true,
@@ -65,11 +65,8 @@ export function NotificationBell({ token }: NotificationBellProps) {
     try {
       const data = await notificationService.list(token, 0, 10);
       setNotifications(data);
-    } catch (error: any) {
-      // Silently handle authentication errors (expected when not logged in)
-      if (!error.message?.includes('Could not validate credentials')) {
-        console.error('Failed to load notifications:', error);
-      }
+    } catch {
+      // Silently ignore — token may be expired or user not logged in
     } finally {
       setLoading(false);
     }
@@ -79,11 +76,8 @@ export function NotificationBell({ token }: NotificationBellProps) {
     try {
       const { unread_count } = await notificationService.getUnreadCount(token);
       setLocalUnreadCount(unread_count);
-    } catch (error: any) {
-      // Silently handle authentication errors (expected when not logged in)
-      if (!error.message?.includes('Could not validate credentials')) {
-        console.error('Failed to load unread count:', error);
-      }
+    } catch {
+      // Silently ignore — token may be expired or user not logged in
     }
   };
 
@@ -164,7 +158,7 @@ export function NotificationBell({ token }: NotificationBellProps) {
                       <div className="h-2 w-2 rounded-full bg-blue-500 ml-2 mt-1" />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{notification.content || notification.message}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                   </p>

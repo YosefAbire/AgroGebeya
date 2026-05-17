@@ -6,13 +6,14 @@ import { usePathname } from 'next/navigation';
 import {
   Users, FileText, Shield, Settings, Database,
   ShieldCheck, Truck, MessageSquare, LayoutDashboard,
-  ChevronLeft, ChevronRight, Menu,
+  ChevronLeft, ChevronRight, CreditCard,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/verification', label: 'Verification', icon: ShieldCheck },
+  { href: '/admin/credit', label: 'Credit', icon: CreditCard },
   { href: '/admin/reports', label: 'Reports', icon: FileText },
   { href: '/admin/transport', label: 'Transport', icon: Truck },
   { href: '/admin/feedback', label: 'Feedback', icon: MessageSquare },

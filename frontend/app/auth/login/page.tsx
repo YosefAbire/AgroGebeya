@@ -276,8 +276,8 @@ export default function LoginPage() {
                 <p className="text-xs font-medium text-foreground">Quick Login (Demo Accounts):</p>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { label: 'Farmer', username: 'yosef', password: 'password123' },
-                    { label: 'Retailer', username: 'retailer1', password: 'password123' },
+                    { label: 'Farmer', username: 'farmer_demo', password: 'demo123' },
+                    { label: 'Retailer', username: 'retailer_demo', password: 'demo123' },
                     { label: 'Admin', username: 'admin', password: 'admin123' },
                   ].map(({ label, username, password }) => (
                     <Button

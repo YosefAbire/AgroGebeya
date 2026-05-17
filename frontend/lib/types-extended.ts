@@ -23,6 +23,8 @@ export interface VerificationRequest {
 
 export interface VerificationSubmit {
   national_id: string;
+  business_name?: string;
+  business_address?: string;
 }
 
 // Transaction Types
@@ -158,7 +160,8 @@ export interface Notification {
   user_id: number;
   type: NotificationType;
   title: string;
-  message: string;
+  content: string;   // backend field name
+  message?: string;  // alias kept for compatibility
   is_read: boolean;
   created_at: string;
 }

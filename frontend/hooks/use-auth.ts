@@ -53,7 +53,7 @@ async function refreshToken(): Promise<string | null> {
   if (!response.ok) return null;
 
   const data = await response.json();
-  localStorage.setItem('authToken', data.access_token);
+  localStorage.setItem('auth_token', data.access_token);
   return data.access_token;
 }
 
@@ -71,7 +71,7 @@ export function useAuth(): AuthContextType {
     const initializeAuth = async () => {
       try {
         const storedUser = localStorage.getItem('user');
-        let storedToken = localStorage.getItem('authToken');
+        let storedToken = localStorage.getItem('auth_token');
 
         if (storedToken && isTokenExpired(storedToken)) {
           storedToken = await refreshToken();
@@ -122,7 +122,7 @@ export function useAuth(): AuthContextType {
       const userData = await userResponse.json();
 
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('authToken', accessToken);
+      localStorage.setItem('auth_token', accessToken);
       if (refreshTokenValue) {
         localStorage.setItem('refreshToken', refreshTokenValue);
       }
@@ -139,7 +139,7 @@ export function useAuth(): AuthContextType {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
       localStorage.removeItem('user');
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('auth_token');
       localStorage.removeItem('refreshToken');
       setUser(null);
       setToken(null);
@@ -189,7 +189,7 @@ export function useAuth(): AuthContextType {
   );
 
   const refreshUser = useCallback(async () => {
-    const storedToken = localStorage.getItem('authToken')
+    const storedToken = localStorage.getItem('auth_token')
     if (!storedToken) return
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {

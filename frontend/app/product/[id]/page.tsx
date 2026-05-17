@@ -49,19 +49,18 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   }
 
   const handlePlaceOrder = async () => {
-    if (!user) {
-      toast.error('Please login to place an order')
+    // Read from localStorage as a fallback to prevent stale AuthProvider context issues
+    const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+    const currentUser = user || (storedUser ? JSON.parse(storedUser) : null);
+
+    if (!currentUser) {
+      toast.error('Please log in to place an order')
       router.push('/auth/login')
       return
     }
 
-    if (user.role !== 'retailer') {
+    if (currentUser.role?.toLowerCase() !== 'retailer') {
       toast.error('Only retailers can place orders')
-      return
-    }
-
-    if (product.available_quantity < quantity) {
-      toast.error('Requested quantity exceeds available stock')
       return
     }
 
@@ -70,13 +69,25 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       return
     }
 
+    if (product.available_quantity < quantity) {
+      toast.error('Requested quantity exceeds available stock')
+      return
+    }
+
+    const currentToken = token || localStorage.getItem('auth_token')
+    if (!currentToken) {
+      toast.error('Session expired. Please log in again.')
+      router.push('/auth/login')
+      return
+    }
+
     setSubmitting(true)
     try {
       await orderService.createOrder({
         product_id: Number(id),
         quantity,
-        delivery_date: deliveryDate,
-      }, token!)
+        delivery_date: new Date(deliveryDate + 'T12:00:00').toISOString(),
+      }, currentToken)
 
       toast.success('Order placed successfully!')
       router.push('/orders')
@@ -286,8 +297,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               )}
             </div>
 
-            {/* Order Form — retailers only */}
-            {user?.role === 'retailer' ? (
+            {/* Order Form */}
             <div className="rounded-lg border border-border bg-card p-6">
               <h3 className="text-lg font-semibold text-foreground mb-6">Place Your Order</h3>
 
@@ -348,39 +358,37 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                   </div>
                 </div>
 
-                {/* Order Button */}
-                <button
-                  onClick={handlePlaceOrder}
-                  disabled={submitting || !deliveryDate || product.available_quantity === 0}
-                  className="w-full rounded-lg bg-primary px-6 py-3 text-lg font-semibold text-primary-foreground hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submitting ? (
-                    <>Processing...</>
-                  ) : product.available_quantity === 0 ? (
-                    <>Out of Stock</>
-                  ) : (
-                    <>
-                      <ShoppingCart className="h-5 w-5" />
-                      Place Order
-                    </>
-                  )}
-                </button>
+                {/* Order Button — always visible, guards inside handlePlaceOrder */}
+                {product.available_quantity === 0 ? (
+                  <div className="w-full rounded-lg bg-secondary px-6 py-3 text-center text-lg font-semibold text-muted-foreground">
+                    Out of Stock
+                  </div>
+                ) : (
+                  <button
+                    onClick={handlePlaceOrder}
+                    disabled={submitting}
+                    className="w-full rounded-lg bg-primary px-6 py-3 text-lg font-semibold text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? (
+                      <><span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />Processing...</>
+                    ) : (
+                      <><ShoppingCart className="h-5 w-5" />Place Order</>
+                    )}
+                  </button>
+                )}
 
-                <p className="text-xs text-center text-muted-foreground">
-                  By placing an order, you agree to our terms and conditions
-                </p>
+                {!user && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    <a href="/auth/login" className="text-primary hover:underline font-medium">Log in</a> as a retailer to place an order
+                  </p>
+                )}
+                {user?.role === 'farmer' && (
+                  <p className="text-xs text-center text-amber-600">
+                    Farmers cannot place orders. Use a retailer account to buy.
+                  </p>
+                )}
               </div>
             </div>
-            ) : user?.role === 'farmer' ? (
-              <div className="rounded-lg border border-border bg-card p-6 text-center text-muted-foreground">
-                <ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">Farmers cannot place orders. Switch to a retailer account to buy products.</p>
-              </div>
-            ) : (
-              <div className="rounded-lg border border-border bg-card p-6 text-center text-muted-foreground">
-                <p className="text-sm"><a href="/auth/login" className="text-primary hover:underline">Log in</a> as a retailer to place an order.</p>
-              </div>
-            )}
           </div>
         </div>
 

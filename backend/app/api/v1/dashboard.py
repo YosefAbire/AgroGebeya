@@ -49,12 +49,12 @@ async def get_farmer_stats(
     )
     pending_orders = pending_orders_result.scalar() or 0
     
-    # Total earnings (sum of delivered orders)
+    # Total earnings (sum of paid/completed orders)
     total_earnings_result = await db.execute(
         select(func.sum(Order.total_price)).where(
             and_(
                 Order.farmer_id == current_user.id,
-                Order.status == "delivered"
+                Order.status.in_(["delivered", "paid", "completed"])
             )
         )
     )

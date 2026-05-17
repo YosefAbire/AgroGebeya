@@ -1,6 +1,12 @@
 import { api } from './api';
 import { Order } from './types';
 
+interface OrderCreatePayload {
+  product_id: number;
+  quantity: number;
+  delivery_date?: string; // ISO datetime string
+}
+
 export const orderService = {
   async getOrders(token: string): Promise<Order[]> {
     return api.get<Order[]>('/api/v1/orders', token);
@@ -10,7 +16,7 @@ export const orderService = {
     return api.get<Order>(`/api/v1/orders/${id}`, token);
   },
 
-  async createOrder(data: Partial<Order>, token: string): Promise<Order> {
+  async createOrder(data: OrderCreatePayload, token: string): Promise<Order> {
     return api.post<Order>('/api/v1/orders', data, token);
   },
 

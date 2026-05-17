@@ -65,12 +65,18 @@ async def submit_verification(
         existing_request.status = "pending"
         existing_request.submitted_at = datetime.utcnow()
         existing_request.rejection_reason = None
+        if verification_data.business_name:
+            existing_request.business_name = verification_data.business_name
+        if verification_data.business_address:
+            existing_request.business_address = verification_data.business_address
         verification_request = existing_request
     else:
         verification_request = VerificationRequest(
             user_id=current_user.id,
             encrypted_national_id=encrypted_id,
-            status="pending"
+            status="pending",
+            business_name=verification_data.business_name,
+            business_address=verification_data.business_address,
         )
         db.add(verification_request)
     
@@ -253,24 +259,36 @@ async def upload_id_images(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Upload front and back photos of the National ID for an existing verification request"""
+    """Upload front and back photos of the National ID.
+    
+    If no verification request exists yet (user skipped the ID number step),
+    one is created automatically so photos can be submitted directly.
+    """
 
     result = await db.execute(
         select(VerificationRequest).where(VerificationRequest.user_id == current_user.id)
     )
     verification_request = result.scalar_one_or_none()
 
-    if not verification_request:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No verification request found. Submit your National ID first."
-        )
-
-    if verification_request.status == "verified":
+    if verification_request and verification_request.status == "verified":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User is already verified"
         )
+
+    # Auto-create a verification record if the user skipped the ID number step
+    if not verification_request:
+        # Use a placeholder — admin will verify identity from the photos
+        placeholder_encrypted = encryption_service.encrypt("PHOTO_ONLY")
+        verification_request = VerificationRequest(
+            user_id=current_user.id,
+            encrypted_national_id=placeholder_encrypted,
+            status="pending"
+        )
+        db.add(verification_request)
+        current_user.verification_status = "pending"
+        await db.commit()
+        await db.refresh(verification_request)
 
     # Delete old images if they exist
     if verification_request.id_front_image_url:
@@ -284,6 +302,7 @@ async def upload_id_images(
 
     verification_request.id_front_image_url = front_url
     verification_request.id_back_image_url = back_url
+    verification_request.status = "pending"  # ensure status is pending after photo upload
 
     await db.commit()
     await db.refresh(verification_request)
@@ -299,3 +318,40 @@ def require_verification(user: User):
             detail="National ID verification required"
         )
     return user
+
+
+@router.post("/upload-trade-license", response_model=VerificationRequestResponse)
+async def upload_trade_license(
+    license_image: UploadFile = File(..., description="Signed business/trade license"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Upload trade license for retailer verification."""
+    result = await db.execute(
+        select(VerificationRequest).where(VerificationRequest.user_id == current_user.id)
+    )
+    verification_request = result.scalar_one_or_none()
+
+    if not verification_request:
+        placeholder_encrypted = encryption_service.encrypt("TRADE_LICENSE_ONLY")
+        verification_request = VerificationRequest(
+            user_id=current_user.id,
+            encrypted_national_id=placeholder_encrypted,
+            status="pending"
+        )
+        db.add(verification_request)
+        current_user.verification_status = "pending"
+        await db.commit()
+        await db.refresh(verification_request)
+
+    if verification_request.status == "verified":
+        raise HTTPException(status_code=400, detail="User is already verified")
+
+    # Save license image
+    license_url = await save_id_image(license_image)
+    verification_request.trade_license_url = license_url
+    verification_request.status = "pending"
+
+    await db.commit()
+    await db.refresh(verification_request)
+    return verification_request

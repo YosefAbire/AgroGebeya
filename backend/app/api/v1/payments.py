@@ -6,7 +6,7 @@ from decimal import Decimal
 from datetime import datetime
 from app.core.database import get_db
 from app.models.transaction import Transaction
-from app.models.order import Order
+from app.models.order import Order, OrderStatus
 from app.models.user import User
 from app.schemas.transaction import (
     PaymentInitializeRequest,
@@ -52,11 +52,11 @@ async def initialize_payment(
             detail="Not authorized to pay for this order"
         )
     
-    # Check if order is approved
-    if order.status != "approved":
+    # Check if order is in a payable state
+    if order.status not in ("approved", "pending_payment"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Order must be approved before payment"
+            detail="Order must be approved or pending payment before payment"
         )
     
     # Check if already paid
@@ -168,8 +168,7 @@ async def payment_webhook(
     if payment_status == "success":
         transaction.status = "completed"
         transaction.completed_at = datetime.utcnow()
-        
-        # Update order payment status
+
         order_result = await db.execute(
             select(Order).where(Order.id == transaction.order_id)
         )
@@ -177,15 +176,11 @@ async def payment_webhook(
         if order:
             order.payment_status = "paid"
             order.paid_at = datetime.utcnow()
-        
-        # Send notification to retailer
+            order.status = OrderStatus.PAID  # advance status
+
         await notify_payment_completed(
-            db,
-            transaction.user_id,
-            transaction.order_id,
-            float(transaction.amount)
+            db, transaction.user_id, transaction.order_id, float(transaction.amount)
         )
-        # Also notify farmer that payment was received
         if order:
             await notify_order_status_change(db, order.farmer_id, order.id, "paid")
         

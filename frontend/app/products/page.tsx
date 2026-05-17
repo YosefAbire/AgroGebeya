@@ -1,7 +1,7 @@
 'use client'
 
-import { Search, Plus, SlidersHorizontal } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Search, Plus, SlidersHorizontal, RefreshCw } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
 import Header from '@/components/Header'
 import ProductCard from '@/components/ProductCard'
 import Link from 'next/link'
@@ -11,7 +11,7 @@ import { useAuthContext } from '@/components/AuthProvider'
 import { locationService } from '@/lib/services/location-service'
 
 export default function ProductsPage() {
-  const { token } = useAuthContext()
+  const { token, user } = useAuthContext()
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,14 +20,9 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState('newest')
   const [cities, setCities] = useState<string[]>([])
 
-  const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy', 'Spices', 'Beverages']
+  const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy', 'Livestock', 'Herbs', 'Other']
 
-  useEffect(() => {
-    loadProducts()
-    locationService.getCities().then(setCities).catch(() => {})
-  }, [])
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     try {
       setIsLoading(true)
       const data = await productService.getProducts(token || undefined)
@@ -37,7 +32,19 @@ export default function ProductsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    loadProducts()
+    locationService.getCities().then(setCities).catch(() => {})
+  }, [loadProducts])
+
+  // Refresh when tab regains focus (so new products appear after farmer adds one)
+  useEffect(() => {
+    const onFocus = () => loadProducts()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [loadProducts])
 
   // Filter and sort products
   let filteredProducts = [...products]
@@ -83,13 +90,18 @@ export default function ProductsPage() {
             <h1 className="text-3xl font-bold text-foreground">Products Marketplace</h1>
             <p className="mt-1 text-muted-foreground">Browse all available agricultural products</p>
           </div>
-          <Link
-            href="/products/new"
-            className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors whitespace-nowrap"
-          >
-            <Plus className="h-5 w-5" />
-            List Product
-          </Link>
+          <div className="flex items-center gap-2">
+            <button onClick={loadProducts} className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary transition-colors">
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
+            {user?.role === 'farmer' && (
+              <Link href="/products/new" className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors whitespace-nowrap">
+                <Plus className="h-5 w-5" />
+                List Product
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Search and Filters */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, X, User, LogOut, Settings, Package, ShoppingCart, LayoutDashboard, Archive, MessageSquare, BarChart2 } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings, Package, ShoppingCart, LayoutDashboard, Archive, MessageSquare, BarChart2, CreditCard } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -28,6 +28,7 @@ const RETAILER_NAV = [
   { href: '/dashboard/retailer', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/products', label: 'Browse Products', icon: Package },
   { href: '/orders', label: 'My Orders', icon: ShoppingCart },
+  { href: '/credit', label: 'Credit', icon: CreditCard },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
   { href: '/transport', label: 'Transport', icon: Archive },
 ]
@@ -42,7 +43,7 @@ export default function Header() {
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
-    const authToken = localStorage.getItem('token')
+    const authToken = localStorage.getItem('auth_token')
     if (userData) {
       try { setUser(JSON.parse(userData)) } catch {}
     }

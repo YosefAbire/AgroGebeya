@@ -28,7 +28,7 @@ async function refreshToken(): Promise<string | null> {
   if (!response.ok) return null;
 
   const data = await response.json();
-  localStorage.setItem('authToken', data.access_token);
+  localStorage.setItem('auth_token', data.access_token);
   return data.access_token;
 }
 
@@ -37,12 +37,23 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  let token = options.token || localStorage.getItem('authToken');
+  let token = options.token || localStorage.getItem('auth_token');
 
-  // Refresh if expired
+  // If token is expired, try to refresh
   if (token && isTokenExpired(token)) {
-    token = await refreshToken();
-    if (!token) throw new Error('Session expired. Please log in again.');
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      token = refreshed;
+    } else {
+      // Refresh failed — clear stale token silently
+      localStorage.removeItem('auth_token');
+      // Only throw if the caller explicitly passed a token (authenticated request)
+      // For background calls (notifications, auth init) just proceed without auth
+      if (options.token) {
+        throw new Error('Session expired. Please log in again.');
+      }
+      token = null;
+    }
   }
 
   const { ...fetchOptions } = options;

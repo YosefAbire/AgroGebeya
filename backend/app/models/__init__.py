@@ -11,6 +11,7 @@ from app.models.audit import AuditLog, AuditActionType
 from app.models.feedback import Feedback, FeedbackType, FeedbackStatus
 from app.models.config import SystemConfig, ConfigHistory, ConfigValueType
 from app.models.backup import Backup, BackupType
+from app.models.credit import RetailerCredit, Invoice, StockReservation
 
 __all__ = [
     "User",

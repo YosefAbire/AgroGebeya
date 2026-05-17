@@ -14,6 +14,7 @@ from app.api.v1 import (
     uploads,
     dashboard,
     locations,
+    credit,
 )
 from app.api.v1.admin import (
     audit,
@@ -41,6 +42,9 @@ api_router.include_router(notifications.router, prefix="/notifications", tags=["
 api_router.include_router(feedback.router, prefix="/feedback", tags=["feedback"])
 api_router.include_router(i18n.router, prefix="/i18n", tags=["internationalization"])
 api_router.include_router(uploads.router, prefix="/uploads", tags=["uploads"])
+
+# Credit / deferred payment endpoints
+api_router.include_router(credit.router, prefix="/credit", tags=["credit"])
 
 # WebSocket endpoints
 api_router.include_router(ws.router, prefix="/ws", tags=["websocket"])

@@ -56,15 +56,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = async () => {
       try {
         const storedToken = authService.getToken()
-        
-        if (storedToken) {
-          setToken(storedToken)
-          // Fetch current user from backend
-          const apiUser = await authService.getCurrentUser(storedToken)
-          setUser(mapApiUserToUser(apiUser))
+        if (!storedToken) { setIsLoading(false); return }
+
+        // Check expiry before making a network call
+        try {
+          const payload = JSON.parse(atob(storedToken.split('.')[1]))
+          if (Date.now() >= payload.exp * 1000) {
+            // Token expired — clear silently, don't throw
+            authService.removeToken()
+            setIsLoading(false)
+            return
+          }
+        } catch {
+          authService.removeToken()
+          setIsLoading(false)
+          return
         }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error)
+
+        setToken(storedToken)
+        const apiUser = await authService.getCurrentUser(storedToken)
+        setUser(mapApiUserToUser(apiUser))
+      } catch {
+        // Network error or 401 — clear token silently
         authService.removeToken()
         setToken(null)
         setUser(null)

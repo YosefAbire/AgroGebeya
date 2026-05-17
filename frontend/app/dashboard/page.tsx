@@ -6,31 +6,30 @@ import { useAuth } from '@/hooks/use-auth'
 
 export default function Dashboard() {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, isLoading } = useAuth()
 
   useEffect(() => {
-    if (loading) return
+    if (isLoading) return
 
     if (!user) {
-      router.push('/auth/login')
+      router.replace('/auth/login')
       return
     }
 
-    // Redirect based on user role
     switch (user.role) {
       case 'farmer':
-        router.push('/dashboard/farmer')
+        router.replace('/dashboard/farmer')
         break
       case 'retailer':
-        router.push('/dashboard/retailer')
+        router.replace('/dashboard/retailer')
         break
       case 'admin':
-        router.push('/admin/dashboard')
+        router.replace('/admin/dashboard')
         break
       default:
-        router.push('/dashboard/farmer')
+        router.replace('/dashboard/farmer')
     }
-  }, [user, loading, router])
+  }, [user, isLoading, router])
 
   // Loading state
   return (

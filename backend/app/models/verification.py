@@ -18,6 +18,10 @@ class VerificationRequest(Base):
     encrypted_national_id = Column(String(255), nullable=False)
     id_front_image_url = Column(String(500))
     id_back_image_url = Column(String(500))
+    # Retailer business info
+    business_name = Column(String(255))
+    business_address = Column(String(500))
+    trade_license_url = Column(String(500))
     status = Column(String(20), nullable=False, default="pending")
     submitted_at = Column(DateTime(timezone=True), server_default=func.now())
     reviewed_at = Column(DateTime(timezone=True))

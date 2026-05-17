@@ -13,15 +13,17 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function RetailerDashboard() {
-  const { user, token } = useAuth()
+  const { user, token, isLoading } = useAuth()
   const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentPurchases, setRecentPurchases] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (user && user.role !== 'retailer') { router.replace('/dashboard'); return }
-  }, [user, router])
+    if (isLoading) return
+    if (!user) { router.replace('/auth/login'); return }
+    if (user.role !== 'retailer') { router.replace('/dashboard'); return }
+  }, [user, isLoading, router])
 
   useEffect(() => {
     if (token) {
@@ -39,19 +41,20 @@ export default function RetailerDashboard() {
       ])
       setStats(statsData)
       setRecentPurchases(purchasesData)
-    } catch (error) {
-      console.error('Error loading dashboard data:', error)
-      toast.error('Failed to load dashboard data')
+    } catch (error: any) {
+      if (!error.message?.includes('Cannot reach the server')) {
+        toast.error('Failed to load dashboard data')
+      }
     } finally {
       setLoading(false)
     }
   }
 
   const statsCards = [
-    { icon: ShoppingCart, label: 'Total Orders', value: loading ? '...' : (stats?.total_orders?.toString() || '0'), color: 'primary' as const },
-    { icon: Truck, label: 'Pending Deliveries', value: loading ? '...' : (stats?.pending_deliveries?.toString() || '0'), color: 'accent' as const },
-    { icon: DollarSign, label: 'Total Spent', value: loading ? '...' : `${stats?.total_spent?.toLocaleString() || '0'} ETB`, color: 'secondary' as const },
-    { icon: MapPin, label: 'In Transit', value: loading ? '...' : (stats?.in_transit?.toString() || '0'), color: 'primary' as const },
+    { icon: ShoppingCart, label: 'Total Orders',       value: loading ? '...' : (stats?.total_orders?.toString() || '0'),                    color: 'primary' as const,   href: '/orders' },
+    { icon: Truck,        label: 'Pending Deliveries', value: loading ? '...' : (stats?.pending_deliveries?.toString() || '0'),               color: 'accent' as const,    href: '/orders?status=pending_payment' },
+    { icon: DollarSign,   label: 'Total Spent',        value: loading ? '...' : `${stats?.total_spent?.toLocaleString() || '0'} ETB`,         color: 'secondary' as const, href: '/orders?status=completed' },
+    { icon: MapPin,       label: 'In Transit',         value: loading ? '...' : (stats?.in_transit?.toString() || '0'),                       color: 'primary' as const,   href: '/orders?status=approved' },
   ]
 
   const transformedOrders = recentPurchases.map(order => ({
@@ -91,7 +94,9 @@ export default function RetailerDashboard() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {statsCards.map((stat, index) => (
-            <StatsCard key={index} icon={stat.icon} label={stat.label} value={stat.value} color={stat.color} />
+            <Link key={index} href={stat.href} className="block hover:opacity-90 transition-opacity">
+              <StatsCard icon={stat.icon} label={stat.label} value={stat.value} color={stat.color} />
+            </Link>
           ))}
         </div>
 

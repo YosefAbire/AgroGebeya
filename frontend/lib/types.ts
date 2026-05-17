@@ -67,8 +67,19 @@ export interface Order {
   retailer_id: number;
   quantity: number;
   total_price: number;
-  status: 'pending' | 'approved' | 'rejected' | 'delivered';
+  status: 'pending' | 'approved' | 'pending_payment' | 'paid' | 'completed' | 'cancelled' | 'rejected' | 'delivered';
   delivery_date?: string;
+  payment_status?: string;
+  paid_at?: string;
+  completed_at?: string;
+  cancelled_at?: string;
+  cancellation_reason?: string;
+  payment_deadline?: string;
   created_at: string;
   updated_at?: string;
+  // Enriched fields
+  product_name?: string;
+  product_unit?: string;
+  retailer_name?: string;
+  farmer_name?: string;
 }

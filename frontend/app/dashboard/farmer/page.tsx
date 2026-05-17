@@ -13,15 +13,17 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function FarmerDashboard() {
-  const { user, token } = useAuth()
+  const { user, token, isLoading } = useAuth()
   const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (user && user.role !== 'farmer') { router.replace('/dashboard'); return }
-  }, [user, router])
+    if (isLoading) return  // wait for auth to resolve
+    if (!user) { router.replace('/auth/login'); return }
+    if (user.role !== 'farmer') { router.replace('/dashboard'); return }
+  }, [user, isLoading, router])
 
   useEffect(() => {
     if (token) {
@@ -40,9 +42,11 @@ export default function FarmerDashboard() {
       ])
       setStats(statsData)
       setRecentOrders(ordersData)
-    } catch (error) {
-      console.error('Error loading dashboard data:', error)
-      toast.error('Failed to load dashboard data')
+    } catch (error: any) {
+      // Silently ignore network errors on initial load — backend may be starting up
+      if (!error.message?.includes('Cannot reach the server')) {
+        toast.error('Failed to load dashboard data')
+      }
     } finally {
       setLoading(false)
     }
@@ -54,24 +58,28 @@ export default function FarmerDashboard() {
       label: 'Total Products Listed',
       value: loading ? '...' : (stats?.total_products?.toString() || '0'),
       color: 'primary' as const,
+      href: '/products/manage',
     },
     {
       icon: ShoppingCart,
       label: 'Pending Orders',
       value: loading ? '...' : (stats?.pending_orders?.toString() || '0'),
       color: 'accent' as const,
+      href: '/orders?status=pending',
     },
     {
       icon: DollarSign,
       label: 'Total Earnings',
       value: loading ? '...' : `${stats?.total_earnings?.toLocaleString() || '0'} ETB`,
       color: 'secondary' as const,
+      href: '/orders?status=completed',
     },
     {
       icon: TrendingUp,
       label: 'Active Listings',
       value: loading ? '...' : (stats?.active_listings?.toString() || '0'),
       color: 'primary' as const,
+      href: '/products/manage?filter=active',
     },
   ]
 
@@ -116,13 +124,14 @@ export default function FarmerDashboard() {
         {/* Stats Grid */}
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {statsCards.map((stat, index) => (
-            <StatsCard
-              key={index}
-              icon={stat.icon}
-              label={stat.label}
-              value={stat.value}
-              color={stat.color}
-            />
+            <Link key={index} href={stat.href} className="block hover:opacity-90 transition-opacity">
+              <StatsCard
+                icon={stat.icon}
+                label={stat.label}
+                value={stat.value}
+                color={stat.color}
+              />
+            </Link>
           ))}
         </div>
 

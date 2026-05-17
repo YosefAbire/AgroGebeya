@@ -92,8 +92,8 @@ export default function NewProductPage() {
         throw new Error('Please fill in all required fields')
       }
 
-      // Create product first
-      const response = await fetch('http://127.0.0.1:8000/api/products', {
+      // Create product
+      const response = await fetch('http://127.0.0.1:8000/api/v1/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -210,12 +210,13 @@ export default function NewProductPage() {
                   className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select category</option>
-                  <option value="vegetables">Vegetables</option>
-                  <option value="fruits">Fruits</option>
-                  <option value="grains">Grains</option>
-                  <option value="dairy">Dairy</option>
-                  <option value="livestock">Livestock</option>
-                  <option value="other">Other</option>
+                  <option value="Vegetables">Vegetables</option>
+                  <option value="Fruits">Fruits</option>
+                  <option value="Grains">Grains</option>
+                  <option value="Dairy">Dairy</option>
+                  <option value="Livestock">Livestock</option>
+                  <option value="Herbs">Herbs</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
