@@ -2,7 +2,9 @@
 Unit tests for model properties and computed fields.
 No DB required — tests pure Python logic on model instances.
 """
+
 import pytest
+
 from decimal import Decimal
 from datetime import datetime, timedelta
 
@@ -10,12 +12,14 @@ pytestmark = pytest.mark.unit
 
 
 class TestRetailerCreditProperties:
+
     def _make_credit(self, limit, used):
         from app.models.credit import RetailerCredit
-        c = RetailerCredit.__new__(RetailerCredit)
-        c.credit_limit = Decimal(str(limit))
-        c.used_credit = Decimal(str(used))
-        return c
+
+        return RetailerCredit(
+            credit_limit=Decimal(str(limit)),
+            used_credit=Decimal(str(used)),
+        )
 
     def test_available_credit_calculation(self):
         c = self._make_credit(50000, 20000)
@@ -35,15 +39,23 @@ class TestRetailerCreditProperties:
 
 
 class TestInvoiceProperties:
-    def _make_invoice(self, total, paid, penalty=0, due_days_offset=1):
+
+    def _make_invoice(
+        self,
+        total,
+        paid,
+        penalty=0,
+        due_days_offset=1,
+    ):
         from app.models.credit import Invoice
-        inv = Invoice.__new__(Invoice)
-        inv.total_amount = Decimal(str(total))
-        inv.paid_amount = Decimal(str(paid))
-        inv.penalty_amount = Decimal(str(penalty))
-        inv.status = "issued"
-        inv.due_date = datetime.utcnow() + timedelta(days=due_days_offset)
-        return inv
+
+        return Invoice(
+            total_amount=Decimal(str(total)),
+            paid_amount=Decimal(str(paid)),
+            penalty_amount=Decimal(str(penalty)),
+            status="issued",
+            due_date=datetime.utcnow() + timedelta(days=due_days_offset),
+        )
 
     def test_balance_due_unpaid(self):
         inv = self._make_invoice(1000, 0)
@@ -72,20 +84,31 @@ class TestInvoiceProperties:
     def test_paid_invoice_not_overdue(self):
         inv = self._make_invoice(1000, 1000, due_days_offset=-1)
         inv.status = "paid"
+
         assert inv.is_overdue is False
 
 
 class TestOrderStatusEnum:
+
     def test_all_statuses_defined(self):
         from app.models.order import OrderStatus
+
         expected = {
-            "pending", "approved", "rejected",
-            "pending_payment", "paid", "completed",
-            "cancelled", "delivered",
+            "pending",
+            "approved",
+            "rejected",
+            "pending_payment",
+            "paid",
+            "completed",
+            "cancelled",
+            "delivered",
         }
+
         actual = {s.value for s in OrderStatus}
+
         assert expected.issubset(actual)
 
     def test_status_is_string(self):
         from app.models.order import OrderStatus
+
         assert isinstance(OrderStatus.PENDING.value, str)

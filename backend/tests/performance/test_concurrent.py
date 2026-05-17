@@ -35,7 +35,7 @@ class TestConcurrentRequests:
         from tests.factories.user_factory import create_retailer
         from tests.helpers.auth import auth_headers
 
-        # Create 10 verified retailers
+        # Create 10 verified retailers with unique emails
         retailers = [
             await create_retailer(db, verified=True)
             for _ in range(10)
